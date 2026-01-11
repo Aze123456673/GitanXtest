@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BMW - The Future of Driving</title>
+    <title>GitanX - Portfolio</title>
     <style>
         * {
             margin: 0;
@@ -33,14 +33,14 @@
             top: 50%;
             left: 50%;
             width: 100vw;
-            height: 56.25vw; /* Ratio 16:9 */
+            height: 56.25vw;
             min-height: 100vh;
-            min-width: 177.77vh; /* Ratio 16:9 */
+            min-width: 177.77vh;
             transform: translate(-50%, -50%);
             pointer-events: none;
         }
 
-        /* Overlay sombre pour meilleure lisibilité */
+        /* Overlay sombre */
         .overlay {
             position: fixed;
             top: 0;
@@ -56,7 +56,7 @@
             z-index: 1;
         }
 
-        /* Contenu par-dessus la vidéo */
+        /* Contenu */
         .content {
             position: relative;
             z-index: 2;
@@ -68,7 +68,7 @@
             color: white;
         }
 
-        /* Header avec logo */
+        /* Logo en haut */
         .header {
             text-align: center;
             animation: fadeInDown 1.5s ease;
@@ -77,132 +77,44 @@
         .logo {
             font-size: 6rem;
             font-weight: 900;
-            letter-spacing: 25px;
+            letter-spacing: 20px;
             text-shadow: 
                 0 0 20px rgba(255, 255, 255, 0.8),
                 0 0 40px rgba(255, 255, 255, 0.5),
                 0 0 80px rgba(157, 0, 255, 0.4);
-            margin-bottom: 20px;
         }
 
-        .tagline {
-            font-size: 1.3rem;
-            letter-spacing: 8px;
-            text-transform: uppercase;
-            font-weight: 300;
-            opacity: 0.9;
-        }
-
-        /* Centre avec titre principal */
+        /* Centre avec bouton */
         .hero {
             text-align: center;
             animation: fadeInUp 2s ease 0.5s backwards;
         }
 
-        .hero h1 {
-            font-size: 4.5rem;
-            font-weight: 700;
-            margin-bottom: 30px;
-            line-height: 1.2;
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
-        }
-
-        .hero p {
-            font-size: 1.8rem;
-            font-weight: 300;
-            letter-spacing: 3px;
-            opacity: 0.95;
-            margin-bottom: 50px;
-        }
-
-        .cta-buttons {
-            display: flex;
-            gap: 30px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 18px 50px;
-            font-size: 1.2rem;
+        .visit-btn {
+            padding: 20px 60px;
+            font-size: 1.5rem;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 5px;
             border: none;
             cursor: pointer;
             transition: all 0.4s ease;
-            font-weight: 600;
+            font-weight: 700;
             border-radius: 50px;
-        }
-
-        .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            box-shadow: 0 10px 40px rgba(118, 75, 162, 0.4);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 50px rgba(118, 75, 162, 0.6);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: white;
-            border: 2px solid white;
-        }
-
-        .btn-secondary:hover {
-            background: white;
-            color: #000;
-            transform: translateY(-5px);
-        }
-
-        /* Footer avec infos */
-        .footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            animation: fadeIn 2s ease 1s backwards;
-        }
-
-        .specs {
-            display: flex;
-            gap: 50px;
-        }
-
-        .spec-item {
-            text-align: left;
-        }
-
-        .spec-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .spec-label {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            opacity: 0.8;
-        }
-
-        .social {
-            display: flex;
-            gap: 25px;
-            font-size: 1.5rem;
-        }
-
-        .social a {
-            color: white;
-            opacity: 0.8;
-            transition: all 0.3s ease;
+            box-shadow: 0 10px 40px rgba(118, 75, 162, 0.5);
             text-decoration: none;
+            display: inline-block;
         }
 
-        .social a:hover {
-            opacity: 1;
-            transform: scale(1.2);
+        .visit-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 50px rgba(118, 75, 162, 0.7);
+        }
+
+        /* Footer vide pour structure */
+        .footer {
+            height: 60px;
         }
 
         /* Bouton son */
@@ -246,23 +158,6 @@
             }
         }
 
-        /* Scroll indicator */
-        .scroll-indicator {
-            position: absolute;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: bounce 2s infinite;
-            z-index: 3;
-        }
-
-        .scroll-indicator::after {
-            content: '↓';
-            font-size: 2rem;
-            color: white;
-            opacity: 0.7;
-        }
-
         /* Animations */
         @keyframes fadeInDown {
             from {
@@ -286,27 +181,6 @@
             }
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateX(-50%) translateY(0);
-            }
-            40% {
-                transform: translateX(-50%) translateY(-10px);
-            }
-            60% {
-                transform: translateX(-50%) translateY(-5px);
-            }
-        }
-
         /* Responsive */
         @media (max-width: 768px) {
             .content {
@@ -318,47 +192,18 @@
                 letter-spacing: 15px;
             }
 
-            .tagline {
-                font-size: 1rem;
-                letter-spacing: 4px;
-            }
-
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-
-            .hero p {
+            .visit-btn {
+                padding: 18px 45px;
                 font-size: 1.2rem;
+                letter-spacing: 3px;
             }
 
-            .cta-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .btn {
-                width: 100%;
-                max-width: 300px;
-                padding: 15px 30px;
-                font-size: 1rem;
-            }
-
-            .footer {
-                flex-direction: column;
-                gap: 30px;
-                align-items: center;
-            }
-
-            .specs {
-                gap: 30px;
-            }
-
-            .spec-value {
-                font-size: 2rem;
-            }
-
-            .spec-label {
-                font-size: 0.8rem;
+            .sound-toggle {
+                bottom: 30px;
+                right: 30px;
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
             }
         }
 
@@ -368,22 +213,10 @@
                 letter-spacing: 10px;
             }
 
-            .hero h1 {
-                font-size: 2rem;
-            }
-
-            .hero p {
+            .visit-btn {
+                padding: 15px 35px;
                 font-size: 1rem;
-            }
-
-            .specs {
-                gap: 20px;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .spec-value {
-                font-size: 1.5rem;
+                letter-spacing: 2px;
             }
         }
     </style>
@@ -393,65 +226,33 @@
     <div class="video-background">
         <iframe 
             id="youtube-video"
-            src="https://www.youtube.com/embed/5fdJuktmyIg?autoplay=1&mute=0&loop=1&playlist=5fdJuktmyIg&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1" 
+            src="https://www.youtube.com/embed/5fdJuktmyIg?autoplay=1&mute=1&loop=1&playlist=5fdJuktmyIg&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1" 
             frameborder="0" 
             allow="autoplay; fullscreen"
             allowfullscreen>
         </iframe>
     </div>
 
-    <!-- Overlay pour assombrir légèrement -->
+    <!-- Overlay -->
     <div class="overlay"></div>
 
-    <!-- Contenu principal -->
+    <!-- Contenu -->
     <div class="content">
-        <!-- Header -->
+        <!-- Logo en haut -->
         <div class="header">
-            <div class="logo">BMW</div>
-            <div class="tagline">Sheer Driving Pleasure</div>
+            <div class="logo">GitanX</div>
         </div>
 
-        <!-- Hero Section -->
+        <!-- Bouton au centre -->
         <div class="hero">
-            <h1>L'AVENIR<br>EST LÀ</h1>
-            <p>Expérience de conduite révolutionnaire</p>
-            
-            <div class="cta-buttons">
-                <button class="btn btn-primary">Découvrir</button>
-                <button class="btn btn-secondary">Essayer</button>
-            </div>
+            <a href="#" class="visit-btn">Visit Real Site</a>
         </div>
 
-        <!-- Footer avec specs -->
-        <div class="footer">
-            <div class="specs">
-                <div class="spec-item">
-                    <div class="spec-value">503</div>
-                    <div class="spec-label">Chevaux</div>
-                </div>
-                <div class="spec-item">
-                    <div class="spec-value">3.5s</div>
-                    <div class="spec-label">0-100 km/h</div>
-                </div>
-                <div class="spec-item">
-                    <div class="spec-value">320</div>
-                    <div class="spec-label">km/h Max</div>
-                </div>
-            </div>
-
-            <div class="social">
-                <a href="#" title="Instagram">📷</a>
-                <a href="#" title="Facebook">📘</a>
-                <a href="#" title="Twitter">🐦</a>
-                <a href="#" title="YouTube">▶️</a>
-            </div>
-        </div>
+        <!-- Footer vide -->
+        <div class="footer"></div>
     </div>
 
-    <!-- Indicateur de scroll -->
-    <div class="scroll-indicator"></div>
-
-    <!-- Bouton pour activer/désactiver le son -->
+    <!-- Bouton son -->
     <button class="sound-toggle muted" id="sound-toggle" title="Activer le son">
         🔇
     </button>
@@ -466,13 +267,11 @@
             isMuted = !isMuted;
             
             if(isMuted) {
-                // Mute
                 soundToggle.textContent = '🔇';
                 soundToggle.classList.add('muted');
                 soundToggle.title = 'Activer le son';
                 iframe.src = iframe.src.replace('mute=0', 'mute=1');
             } else {
-                // Unmute
                 soundToggle.textContent = '🔊';
                 soundToggle.classList.remove('muted');
                 soundToggle.title = 'Désactiver le son';
@@ -480,24 +279,11 @@
             }
         });
 
-        // Ajouter des actions aux boutons
-        document.querySelectorAll('.btn').forEach(button => {
-            button.addEventListener('click', function() {
-                if(this.textContent === 'Découvrir') {
-                    alert('Découvrez notre gamme BMW ! 🚗');
-                } else {
-                    alert('Réservez votre essai ! 🏁');
-                }
-            });
-        });
-
-        // Forcer le redémarrage de la vidéo en boucle
-        window.addEventListener('load', function() {
-            const iframe = document.querySelector('iframe');
-            // S'assurer que la vidéo tourne en boucle
-            setTimeout(() => {
-                iframe.src = iframe.src;
-            }, 100);
+        // Action du bouton Visit Real Site
+        document.querySelector('.visit-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            // Remplace par ton vrai lien
+            window.location.href = 'https://ton-site.com';
         });
     </script>
 </body>
