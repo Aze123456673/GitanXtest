@@ -205,6 +205,47 @@
             transform: scale(1.2);
         }
 
+        /* Bouton son */
+        .sound-toggle {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: pulse 2s ease infinite;
+        }
+
+        .sound-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .sound-toggle.muted {
+            background: rgba(255, 0, 0, 0.3);
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 15px rgba(255, 255, 255, 0);
+            }
+        }
+
         /* Scroll indicator */
         .scroll-indicator {
             position: absolute;
@@ -351,7 +392,8 @@
     <!-- Vidéo YouTube en arrière-plan -->
     <div class="video-background">
         <iframe 
-            src="https://www.youtube.com/embed/5fdJuktmyIg?autoplay=1&mute=1&loop=1&playlist=5fdJuktmyIg&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1" 
+            id="youtube-video"
+            src="https://www.youtube.com/embed/5fdJuktmyIg?autoplay=1&mute=0&loop=1&playlist=5fdJuktmyIg&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1" 
             frameborder="0" 
             allow="autoplay; fullscreen"
             allowfullscreen>
@@ -409,7 +451,35 @@
     <!-- Indicateur de scroll -->
     <div class="scroll-indicator"></div>
 
+    <!-- Bouton pour activer/désactiver le son -->
+    <button class="sound-toggle muted" id="sound-toggle" title="Activer le son">
+        🔇
+    </button>
+
     <script>
+        // Gestion du son
+        let isMuted = true;
+        const soundToggle = document.getElementById('sound-toggle');
+        const iframe = document.getElementById('youtube-video');
+
+        soundToggle.addEventListener('click', function() {
+            isMuted = !isMuted;
+            
+            if(isMuted) {
+                // Mute
+                soundToggle.textContent = '🔇';
+                soundToggle.classList.add('muted');
+                soundToggle.title = 'Activer le son';
+                iframe.src = iframe.src.replace('mute=0', 'mute=1');
+            } else {
+                // Unmute
+                soundToggle.textContent = '🔊';
+                soundToggle.classList.remove('muted');
+                soundToggle.title = 'Désactiver le son';
+                iframe.src = iframe.src.replace('mute=1', 'mute=0');
+            }
+        });
+
         // Ajouter des actions aux boutons
         document.querySelectorAll('.btn').forEach(button => {
             button.addEventListener('click', function() {
