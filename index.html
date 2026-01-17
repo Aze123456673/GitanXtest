@@ -1,198 +1,132 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<title>Obfuscateur Lua - WeAreDevs v1 Style (2026)</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<style>
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #0a0015, #180033);
-    color: #d0b0ff;
-    margin: 0;
-    padding: 20px;
-  }
-  .container { max-width: 1200px; margin: auto; }
-  h1 { color: #bb55ff; text-align: center; margin-bottom: 0.5em; }
-  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 24px 0; }
-  textarea {
-    width: 100%;
-    height: 440px;
-    background: #111122;
-    color: #e0d0ff;
-    border: 1px solid #553366;
-    border-radius: 8px;
-    padding: 16px;
-    font-family: 'Consolas', monospace;
-    font-size: 14px;
-    resize: vertical;
-    line-height: 1.4;
-  }
-  button {
-    display: block;
-    margin: 24px auto;
-    padding: 16px 70px;
-    font-size: 1.4rem;
-    background: #7f00ff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.25s;
-  }
-  button:hover { background: #a040ff; transform: scale(1.05); }
-  #result {
-    background: #0c0014;
-    border: 1px solid #442255;
-    border-radius: 8px;
-    padding: 20px;
-    white-space: pre-wrap;
-    font-family: monospace;
-    min-height: 240px;
-    color: #aaffaa;
-    line-height: 1.45;
-  }
-  .info { text-align: center; color: #aa88ff; font-size: 1rem; margin: 12px 0; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VOITURE DU CIEL × GOUTTE MALADE</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    body {
+      height: 100vh;
+      background: linear-gradient(to bottom, #0f001a, #1a0033, #000814);
+      font-family: "Arial", sans-serif;
+      color: #fff;
+    }
+
+    .scene {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      perspective: 1200px;
+    }
+
+    .car {
+      position: absolute;
+      left: 50%;
+      top: -300px;
+      transform: translateX(-50%) rotateY(15deg) rotateX(25deg);
+      width: 420px;
+      filter: drop-shadow(0 0 80px rgba(255,80,0,0.7));
+      animation: 
+        fall 8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards,
+        shake 0.15s infinite alternate;
+      will-change: transform;
+    }
+
+    @keyframes fall {
+      0%   { top: -300px;  transform: translateX(-50%) rotateY(15deg) rotateX(25deg) scale(0.7); }
+      70%  { top: 55%;     transform: translateX(-50%) rotateY(25deg) rotateX(45deg) scale(1.1); }
+      100% { top: 68%;     transform: translateX(-50%) rotateY(38deg) rotateX(68deg) scale(1.25); }
+    }
+
+    @keyframes shake {
+      from { transform: translateX(-50%) rotateY(15deg) rotateX(25deg) translateZ(0px); }
+      to   { transform: translateX(-50%) rotateY(15deg) rotateX(25deg) translateZ(20px); }
+    }
+
+    .water-drop {
+      position: absolute;
+      width: 180px;
+      height: 240px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle at 40% 30%, 
+        rgba(120,220,255,0.9) 0%, 
+        rgba(0,140,255,0.75) 40%, 
+        rgba(0,80,220,0.4) 70%, 
+        transparent 100%);
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      box-shadow: 
+        inset 0 -40px 60px rgba(255,255,255,0.4),
+        0 0 120px rgba(0,180,255,0.8),
+        inset -20px -30px 60px rgba(0,0,0,0.4);
+      filter: blur(2px);
+      animation: pulse 3.5s infinite ease-in-out;
+      pointer-events: none;
+    }
+
+    @keyframes pulse {
+      0%,100%   { transform: translate(-50%, -50%) scale(1);   opacity: 0.85; }
+      50%       { transform: translate(-50%, -50%) scale(1.15); opacity: 1;   }
+    }
+
+    .title {
+      position: absolute;
+      top: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(3.5rem, 8vw, 9rem);
+      font-weight: 900;
+      text-align: center;
+      color: transparent;
+      background: linear-gradient(90deg, #ff0066, #ffaa00, #00ffea, #ff0066);
+      background-size: 400%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      animation: glitch-text 6s infinite linear;
+      text-shadow: 0 0 30px rgba(255,100,200,0.8);
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    @keyframes glitch-text {
+      0%   { background-position: 0% 50%; }
+      25%  { background-position: 100% 50%; }
+      50%  { background-position: 0% 50%; }
+      75%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 20%, transparent 30%, rgba(0,0,0,0.7) 70%);
+      pointer-events: none;
+    }
+  </style>
 </head>
 <body>
 
-<div class="container">
-  <h1>Obfuscateur Lua - Style WeAreDevs v1</h1>
-  <div class="info">Colle ton code Lua → Obfusque → Résultat à exécuter avec loadstring() sur Roblox</div>
+  <div class="scene">
+    <div class="overlay"></div>
 
-  <div class="split">
-    <div>
-      <strong>Code original :</strong>
-      <textarea id="input" placeholder="Colle ton script Lua ici... (print('Hello Roblox!') par exemple)"></textarea>
-    </div>
-    <div>
-      <strong>Code obfusqué (WeAreDevs v1 style) :</strong>
-      <textarea id="result" readonly></textarea>
-    </div>
+    <h1 class="title">WTF IS THIS CAR DOING?!</h1>
+
+    <img 
+      class="car" 
+      src="https://images.unsplash.com/photo-1502877338535-766e3a6052c0?w=1200&q=85" 
+      alt="voiture qui tombe du ciel style fou"
+    />
+
+    <div class="water-drop"></div>
   </div>
 
-  <button onclick="obfuscate()">OBFUSQUER STYLE WeAreDevs 🔥</button>
-</div>
-
-<script>
-// ───────────────────────────────────────────────
-//   Obfuscateur JS style WeAreDevs v1 (2026)
-// ───────────────────────────────────────────────
-
-function randomOffset(min = -600, max = 600) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function toOctalString(str) {
-  let result = "";
-  for (let i = 0; i < str.length; i++) {
-    result += "\\" + str.charCodeAt(i).toString(8).padStart(3, "0");
-  }
-  return result;
-}
-
-function obfuscate() {
-  const input = document.getElementById("input").value.trim();
-  const resultArea = document.getElementById("result");
-
-  if (!input) {
-    resultArea.value = "// Mets du code quand même bg 😏";
-    return;
-  }
-
-  let code = input;
-
-  // 1. Récupérer et encoder toutes les strings en octal
-  const stringTable = [];
-  code = code.replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, (match) => {
-    const content = match.slice(1, -1);
-    if (content.length < 3 || content.includes('\\')) return match;
-
-    stringTable.push(`"${toOctalString(content)}"`);
-    return `__STR${stringTable.length - 1}__`;
-  });
-
-  // 2. Table de strings encodées
-  const strTable = `local b={${stringTable.join(",")}}`;
-
-  // 3. Table de mapping caractère → offset (style WeAreDevs)
-  const mapping = {};
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_";
-  for (let i = 0; i < chars.length; i++) {
-    const c = chars[i];
-    mapping[c] = randomOffset(-800, 800);
-  }
-
-  let mapCode = "local o={";
-  for (const [char, offset] of Object.entries(mapping)) {
-    mapCode += `${char}=${offset},`;
-  }
-  mapCode = mapCode.slice(0, -1) + "}";  // retire la dernière virgule
-
-  // 4. Fonction de décodage très proche du style WeAreDevs v1
-  const decoder = `
-local function d(i)
-  local s=b[i]
-  local r=""
-  local pos=1
-  local count=0
-  while pos<=#s do
-    local prefix=s:sub(pos,pos)
-    pos=pos+1
-    local num=s:sub(pos,pos+2)
-    pos=pos+3
-    local byte=tonumber(num,8)
-    byte=byte+(o[prefix] or 0)
-    count=count+1
-    if count%3==0 then byte=byte-1
-    elseif count%5==0 then byte=byte+2
-    elseif count%7==0 then byte=byte-3 end
-    r=r..string.char(byte)
-  end
-  return r
-end
-`;
-
-  // 5. Remplacer les placeholders par d(index)
-  code = code.replace(/__STR(\d+)__/g, (m, idx) => `d(${parseInt(idx) + 1})`);
-
-  // 6. Junk code (léger mais présent)
-  const junkLines = [
-    "if false then end",
-    "for _=1,0 do end",
-    "local _=nil",
-    "repeat until true",
-    "-- skrrt",
-    "local _=math.random()"
-  ];
-
-  let lines = code.split("\n");
-  let newLines = [];
-  for (const line of lines) {
-    newLines.push(line);
-    if (Math.random() < 0.25 && line.trim() && !line.includes("--")) {
-      newLines.push("  " + junkLines[Math.floor(Math.random() * junkLines.length)]);
-    }
-  }
-  code = newLines.join("\n");
-
-  // 7. Assemblage final - structure classique WeAreDevs
-  const finalCode = `-- Obfusqué le ${new Date().toLocaleDateString()} 🔥
--- Style WeAreDevs v1-ish
-
-return (function(...)
-${strTable}
-${mapCode}
-${decoder}
-
-${code}
-
-end)(...)
-`;
-
-  resultArea.value = finalCode;
-}
-</script>
 </body>
 </html>
