@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CHASSEUR</title>
+  <title>CHASSEUR - PROTOCOLE ACTIF</title>
   <style>
     * {
       margin: 0;
@@ -14,109 +14,191 @@
     html, body {
       height: 100%;
       background: #000;
-      color: #ddd;
+      color: #e0e0e0;
       font-family: "Courier New", Courier, monospace;
-      overflow-x: hidden;
+      overflow: hidden;
+      image-rendering: pixelated;
     }
 
-    body {
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
       background: 
-        radial-gradient(circle at 15% 85%, #111 0%, #000 40%),
-        #000;
-      background-attachment: fixed;
+        radial-gradient(circle at 20% 90%, #111 0%, transparent 60%),
+        radial-gradient(circle at 80% 10%, #0a0a0a 0%, transparent 70%);
+      opacity: 0.7;
+      pointer-events: none;
+      z-index: -2;
     }
 
     .container {
-      min-height: 100vh;
+      height: 100vh;
       display: grid;
       place-items: center;
       position: relative;
-      padding: 2rem;
+      padding: 1.5rem;
     }
 
-    .title {
-      font-size: clamp(5rem, 14vw, 18rem);
+    .main-title {
+      font-size: clamp(6rem, 18vw, 22rem);
       font-weight: 900;
-      letter-spacing: -0.08em;
-      line-height: 0.82;
+      letter-spacing: -0.12em;
+      line-height: 0.78;
       text-align: center;
       text-transform: uppercase;
       color: transparent;
-      -webkit-text-stroke: 1.2px #eee;
-      text-stroke: 1.2px #eee;
-      background: linear-gradient(90deg, #222 40%, #ccc 50%, #222 60%);
-      background-size: 300% 100%;
+      -webkit-text-stroke: 1.4px #f0f0f0;
+      background: linear-gradient(90deg, #111 20%, #ccc 50%, #111 80%);
+      background-size: 400% 100%;
       -webkit-background-clip: text;
       background-clip: text;
-      animation: glitch-text 8s infinite alternate;
+      animation: 
+        glitch-flow 7s infinite alternate,
+        shake 0.08s infinite alternate;
     }
 
     .subtitle {
-      margin-top: 1.5rem;
-      font-size: clamp(1.6rem, 5vw, 3.8rem);
-      font-weight: 400;
-      letter-spacing: 0.6em;
+      margin-top: 0.8rem;
+      font-size: clamp(1.8rem, 6vw, 4.2rem);
+      letter-spacing: 1.2em;
       text-align: center;
-      color: #555;
+      color: #444;
       text-transform: uppercase;
+      text-shadow: 0 0 10px #000;
     }
 
-    .hunter-word {
-      color: #eee;
-      -webkit-text-stroke: 0.6px #000;
-      text-stroke: 0.6px #000;
-      font-weight: 900;
+    .hunter-glow {
+      color: #f8f8f8;
+      -webkit-text-stroke: 0.8px #000;
+      animation: pulse-glow 4s infinite alternate;
     }
 
-    .scanline {
+    .target-lock {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 180px;
+      height: 180px;
+      border: 2px solid #555;
+      border-radius: 50%;
+      box-shadow: 
+        0 0 40px #000 inset,
+        0 0 25px #222;
+      pointer-events: none;
+      animation: rotate-lock 20s linear infinite;
+    }
+
+    .crosshair {
       position: absolute;
       inset: 0;
+      background: 
+        radial-gradient(circle, transparent 40%, #333 41%, transparent 42%),
+        conic-gradient(from 45deg, transparent 0deg 90deg, #444 90deg 180deg, transparent 180deg 270deg, #444 270deg 360deg);
+      opacity: 0.35;
+      animation: flicker 0.15s infinite alternate;
+    }
+
+    .scanlines, .vhs-noise {
+      position: fixed;
+      inset: 0;
       pointer-events: none;
+      z-index: 999;
+    }
+
+    .scanlines {
       background: repeating-linear-gradient(
         to bottom,
-        transparent 0%,
-        rgba(0,0,0,0.04) 1px,
+        transparent 0px,
+        rgba(0,0,0,0.08) 1px,
         transparent 2px,
-        transparent 4%
+        transparent 5px
       );
-      animation: scan 12s linear infinite;
-      opacity: 0.6;
+      animation: scan-heavy 9s linear infinite;
+      opacity: 0.75;
     }
 
-    .grain {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+    .vhs-noise {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
       mix-blend-mode: overlay;
+      animation: grain-move 0.8s steps(5) infinite;
     }
 
-    @keyframes glitch-text {
-      0%,100%   { background-position: 0% 50%; }
-      25%       { background-position: 100% 50%; }
-      50%       { background-position: 30% 50%; }
-      75%       { background-position: 70% 50%; }
+    .warning {
+      position: absolute;
+      top: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.4rem;
+      color: #555;
+      letter-spacing: 0.5em;
+      animation: blink 1.8s infinite;
+      text-shadow: 0 0 8px #000;
     }
 
-    @keyframes scan {
-      0%   { transform: translateY(-100%); }
-      100% { transform: translateY(100%); }
+    @keyframes glitch-flow {
+      0%   { background-position: 0% 50%; }
+      30%  { background-position: 120% 50%; }
+      60%  { background-position: -40% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
-    @media (max-width: 600px) {
-      .title { -webkit-text-stroke: 0.8px #eee; }
-      .subtitle { letter-spacing: 0.4em; }
+    @keyframes shake {
+      0%,100% { transform: translate(0,0); }
+      50%     { transform: translate(2px, -1px); }
+    }
+
+    @keyframes pulse-glow {
+      0%   { text-shadow: 0 0 10px #000; }
+      100% { text-shadow: 0 0 35px #444, 0 0 60px #222; }
+    }
+
+    @keyframes rotate-lock {
+      from { transform: translate(-50%,-50%) rotate(0deg); }
+      to   { transform: translate(-50%,-50%) rotate(360deg); }
+    }
+
+    @keyframes scan-heavy {
+      0%   { transform: translateY(-120%); }
+      100% { transform: translateY(120%); }
+    }
+
+    @keyframes flicker {
+      0%,100% { opacity: 0.35; }
+      50%     { opacity: 0.55; }
+    }
+
+    @keyframes grain-move {
+      0%   { background-position: 0 0; }
+      100% { background-position: 100px 100px; }
+    }
+
+    @keyframes blink {
+      0%,100% { opacity: 0.3; }
+      50%     { opacity: 0.9; }
+    }
+
+    @media (max-width: 768px) {
+      .main-title { -webkit-text-stroke: 1px #eee; font-size: clamp(5rem, 16vw, 14rem); }
+      .subtitle { letter-spacing: 0.8em; }
     }
   </style>
 </head>
 <body>
 
-  <div class="grain"></div>
-  <div class="scanline"></div>
+  <div class="vhs-noise"></div>
+  <div class="scanlines"></div>
+
+  <div class="warning">TARGET ACQUIRED - LOCK ON</div>
 
   <div class="container">
-    <h1 class="title">CHASSEUR</h1>
-    <p class="subtitle">THE <span class="hunter-word">HUNTER</span> NEVER SLEEPS</p>
+    <div class="target-lock">
+      <div class="crosshair"></div>
+    </div>
+
+    <h1 class="main-title">CHASSEUR</h1>
+    <p class="subtitle">LA <span class="hunter-glow">NIGHT</span> EST À LUI</p>
   </div>
 
 </body>
