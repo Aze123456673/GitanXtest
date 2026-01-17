@@ -2,205 +2,189 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<title>Déobfuscateur Lua - Grok Edition 2026 (Amélioré)</title>
+<title>Obfuscateur Lua Roblox - Niveau Moyen 2026</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <style>
-  body { 
-    font-family: 'Segoe UI', sans-serif; 
-    background: linear-gradient(135deg, #0d001a, #1a0033); 
-    color: #d0c0ff; 
-    margin:0; 
-    padding:20px; 
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(135deg, #0a0015, #180033);
+    color: #d0b0ff;
+    margin: 0;
+    padding: 20px;
   }
-  h1 { color: #bb66ff; text-align:center; margin-bottom: 0.8em; }
-  .container { max-width:1100px; margin:auto; }
-  .mode-select { text-align:center; margin:1.5em 0; }
-  select { 
-    padding:8px 16px; 
-    font-size:1rem; 
-    background:#222244; 
-    color:#fff; 
-    border:1px solid #664488; 
-    border-radius:4px; 
+  .container { max-width: 1200px; margin: auto; }
+  h1 { color: #bb55ff; text-align: center; margin-bottom: 0.4em; }
+  .split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 20px 0;
   }
-  textarea { 
-    width:100%; 
-    max-width:1000px; 
-    height:300px; 
-    margin:0 auto 1.5em; 
-    display:block; 
-    background:#111122; 
-    color:#e0d0ff; 
-    border:1px solid #553366; 
-    border-radius:8px; 
-    padding:16px; 
-    font-family:monospace; 
-    font-size:14px; 
-    resize:vertical;
+  textarea {
+    width: 100%;
+    height: 380px;
+    background: #111122;
+    color: #e0d0ff;
+    border: 1px solid #553366;
+    border-radius: 8px;
+    padding: 16px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 14px;
+    resize: vertical;
   }
-  button { 
-    display:block; 
-    margin:1.5em auto; 
-    padding:14px 40px; 
-    font-size:1.2rem; 
-    background:#7f00ff; 
-    color:white; 
-    border:none; 
-    border-radius:6px; 
-    cursor:pointer; 
-    transition:0.2s; 
+  button {
+    display: block;
+    margin: 20px auto;
+    padding: 14px 50px;
+    font-size: 1.3rem;
+    background: #7f00ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.25s;
   }
-  button:hover { background:#9f40ff; transform:scale(1.05); }
-  button:active { transform:scale(0.98); }
-  #result { 
-    width:100%; 
-    max-width:1000px; 
-    margin:1.5em auto; 
-    background:#0a0011; 
-    border:1px solid #442266; 
-    border-radius:8px; 
-    padding:18px; 
-    white-space:pre-wrap; 
-    font-family:monospace; 
-    min-height:180px; 
-    color:#b0ffb0; 
-    line-height:1.4;
+  button:hover { background: #a040ff; transform: scale(1.04); }
+  #result {
+    background: #0c0014;
+    border: 1px solid #442255;
+    border-radius: 8px;
+    padding: 18px;
+    white-space: pre-wrap;
+    font-family: monospace;
+    min-height: 200px;
+    color: #aaffaa;
+    line-height: 1.45;
   }
-  .error { color: #ff9999 !important; }
+  .info {
+    text-align: center;
+    color: #aa88ff;
+    font-size: 0.9rem;
+    margin: 10px 0;
+  }
 </style>
 </head>
 <body>
+
 <div class="container">
-  <h1>Déobfuscateur Lua (Street + WeAreDevs)</h1>
- 
-  <div class="mode-select">
-    <label for="mode">Mode : </label>
-    <select id="mode">
-      <option value="general">Général (basique)</option>
-      <option value="wearedevs" selected>WeAreDevs (amélioré)</option>
-    </select>
+  <h1>Obfuscateur Lua (Roblox friendly) - 2026</h1>
+  <div class="info">Colle ton code → Obfusque → Exécute le résultat avec loadstring()</div>
+
+  <div class="split">
+    <div>
+      <strong>Code original :</strong>
+      <textarea id="input" placeholder="Colle ton script Lua ici..."></textarea>
+    </div>
+    <div>
+      <strong>Code obfusqué :</strong>
+      <textarea id="result" readonly></textarea>
+    </div>
   </div>
 
-  <textarea id="input" placeholder="Colle ton code Lua obfusqué ici..."></textarea>
- 
-  <button onclick="deobfuscate()">DÉOBFUSQUER 🔥</button>
- 
-  <div id="result">Résultat ici... (colle ton script et choisis un mode)</div>
+  <button onclick="obfuscate()">OBFUSQUER MAINTENANT 🔥</button>
 </div>
 
 <script>
-const generalPatterns = [
-  { regex: /loadstring\s*\(/g, replace: 'load(' },
-  { regex: /\\x([0-9a-fA-F]{2})/g, replace: (_, h) => String.fromCharCode(parseInt(h, 16)) },
-  { regex: /\\([0-7]{1,3})/g, replace: (_, o) => String.fromCharCode(parseInt(o, 8)) },
-  // Chaîne de gsub classique
-  {
-    regex: /\b_\s*=\s*([^:]+?)\s*:\s*gsub\s*\(\s*"([^"]+)"\s*,\s*"([^"]*)"\s*\)/g,
-    replace: (m, s, p, r) => {
-      try {
-        const safeP = p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        return s.replace(new RegExp(safeP, 'g'), r);
-      } catch {
-        return m;
-      }
-    }
-  }
-];
+// ───────────────────────────────────────────────
+//   Obfuscateur Lua simple mais efficace (2026)
+// ───────────────────────────────────────────────
 
-const wearedevsPatterns = [
-  // Décodage octal plus robuste (gère \123\56 ou 123\56 etc.)
-  {
-    regex: /"((?:\\?\d{1,3})+)"/g,
-    replace: (match, content) => {
-      try {
-        let result = '';
-        let i = 0;
-        while (i < content.length) {
-          if (content[i] === '\\' && /\d/.test(content[i + 1])) {
-            let num = '';
-            i++;
-            while (i < content.length && /\d/.test(content[i]) && num.length < 3) {
-              num += content[i++];
-            }
-            result += String.fromCharCode(parseInt(num, 8));
-          } else {
-            result += content[i++];
-          }
-        }
-        return `"${result.replace(/"/g, '\\"').replace(/\n/g, '\\n')}"`;
-      } catch {
-        return match;
-      }
-    }
-  },
-  // Supprime la table de mapping (souvent inutile après décodage)
-  { regex: /local\s+[a-zA-Z_]\s*=\s*{[^}]+?}/g, replace: '// Mapping table supprimée' },
-  // Remplace le decodeur en boucle par un commentaire
-  {
-    regex: /for\s+[a-zA-Z_]\s*=\s*[^,]+?,\s*#[^,]+?,\s*[^)]+?\s*do[\s\S]*?end/g,
-    replace: '// WeAreDevs string decoder loop remplacé'
+function randomName() {
+  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$";
+  let name = "";
+  for(let i = 0; i < 18 + Math.floor(Math.random()*12); i++) {
+    name += chars[Math.floor(Math.random() * chars.length)];
   }
-];
+  return "_" + name;
+}
 
-function deobfuscate() {
-  const input = document.getElementById('input').value.trim();
-  const mode = document.getElementById('mode').value;
-  const resultDiv = document.getElementById('result');
+function encodeStringOctal(str) {
+  let result = "";
+  for(let i = 0; i < str.length; i++) {
+    const code = str.charCodeAt(i);
+    result += "\\" + code.toString(8).padStart(3, "0");
+  }
+  return '"' + result + '"';
+}
+
+function obfuscate() {
+  const input = document.getElementById("input").value.trim();
+  const outputArea = document.getElementById("result");
 
   if (!input) {
-    resultDiv.innerHTML = "Colle un script quand même bg 😏";
-    resultDiv.className = 'error';
+    outputArea.value = "// Mets du code quand même bg 😏";
     return;
   }
 
   let code = input;
 
-  // Étape 1 : patterns généraux
-  for (const p of generalPatterns) {
-    if (typeof p.replace === 'function') {
-      code = code.replace(p.regex, p.replace);
-    } else {
-      code = code.replace(p.regex, p.replace);
+  // 1. On remplace les strings par version octal
+  code = code.replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, (match) => {
+    const content = match.slice(1, -1);
+    // On évite d'obfusquer les strings déjà encodées ou très courtes
+    if (content.length < 4 || content.includes("\\")) return match;
+    return encodeStringOctal(content);
+  });
+
+  // 2. Renommage agressif des variables locales
+  const varMap = new Map();
+  const reserved = new Set([
+    "and","break","do","else","elseif","end","false","for","function",
+    "if","in","local","nil","not","or","repeat","return","then","true",
+    "until","while","_G","_ENV","print","warn","error","assert","pcall",
+    "xpcall","load","loadstring","getfenv","setfenv","game","script",
+    "shared","wait","tick","spawn","delay","coroutine","task"
+  ]);
+
+  // Trouver les déclarations local var = ...
+  code = code.replace(/local\s+([a-zA-Z_][a-zA-Z0-9_]*)/g, (full, name) => {
+    if (reserved.has(name)) return full;
+    if (!varMap.has(name)) {
+      varMap.set(name, randomName());
+    }
+    return `local ${varMap.get(name)}`;
+  });
+
+  // Remplacer les utilisations (pas parfait mais efficace sur la plupart des cas)
+  for (const [oldName, newName] of varMap) {
+    const regex = new RegExp(`\\b${oldName}\\b(?!["'])`, "g");
+    code = code.replace(regex, newName);
+  }
+
+  // 3. Ajout de junk aléatoire (très léger)
+  const junkLines = [
+    "if false then end ",
+    "for _=1,0 do end ",
+    "local _=nil;",
+    "repeat until true;",
+    "-- skrrt ",
+    "local _=math.random();"
+  ];
+
+  const lines = code.split("\n");
+  const newLines = [];
+  for (const line of lines) {
+    newLines.push(line);
+    if (Math.random() < 0.25 && line.trim() && !line.includes("--")) {
+      newLines.push("  " + junkLines[Math.floor(Math.random() * junkLines.length)]);
     }
   }
 
-  // Étape 2 : patterns WeAreDevs si sélectionné
-  if (mode === 'wearedevs') {
-    for (const p of wearedevsPatterns) {
-      if (typeof p.replace === 'function') {
-        code = code.replace(p.regex, p.replace);
-      } else {
-        code = code.replace(p.regex, p.replace);
-      }
-    }
+  code = newLines.join("\n");
 
-    // Décodage supplémentaire pour les strings qui auraient échappé
-    code = code.replace(/"((?:\\?\d{1,3})+)"/g, wearedevsPatterns[0].replace);
-  }
+  // 4. Petit nettoyage esthétique + commentaire final
+  code = code.replace(/\s+/g, " ")
+             .replace(/;\s*/g, ";\n")
+             .replace(/end\s*/g, "end\n")
+             .replace(/then\s*/g, "then\n")
+             .replace(/else\s*/g, "else\n")
+             .trim();
 
-  // Nettoyage final
-  code = code
-    .replace(/\s{2,}/g, ' ')           // multiples espaces → un seul
-    .replace(/;\s*/g, ';\n')           // ; → nouvelle ligne
-    .replace(/\s*end\s*/g, '\nend\n')  // meilleur espacement end
-    .replace(/\s*then\s*/g, '\nthen\n')
-    .replace(/\s*else\s*/g, '\nelse\n')
-    .replace(/\s*elseif\s*/g, '\nelseif ')
-    .replace(/,\s*/g, ', ')
-    .replace(/\(\s*/g, '(')
-    .replace(/\s*\)/g, ')')
-    .replace(/{\s*/g, '{ ')
-    .replace(/\s*}/g, ' }')
-    .trim();
+  code = "-- Obfusqué le " + new Date().toLocaleDateString() + " 🔥\n" +
+         "-- Niveau : Moyen (octal + rename + junk)\n\n" +
+         code;
 
-  // Résultat
-  if (code.length < 50) {
-    resultDiv.innerHTML = "(Quasiment rien récupéré... essaie l’autre mode ou un autre script)";
-    resultDiv.className = 'error';
-  } else {
-    resultDiv.textContent = code;
-    resultDiv.className = '';
-  }
+  outputArea.value = code;
 }
 </script>
 </body>
