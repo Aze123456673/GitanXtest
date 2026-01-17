@@ -2,22 +2,22 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<title>Obfuscateur Lua - Style WeAreDevs v1 (2026)</title>
+<title>Obfuscateur Lua - WeAreDevs v1 Style (2026)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <style>
   body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Segoe UI', sans-serif;
     background: linear-gradient(135deg, #0a0015, #180033);
     color: #d0b0ff;
     margin: 0;
     padding: 20px;
   }
   .container { max-width: 1200px; margin: auto; }
-  h1 { color: #bb55ff; text-align: center; margin-bottom: 0.4em; }
-  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+  h1 { color: #bb55ff; text-align: center; margin-bottom: 0.5em; }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 24px 0; }
   textarea {
     width: 100%;
-    height: 420px;
+    height: 440px;
     background: #111122;
     color: #e0d0ff;
     border: 1px solid #553366;
@@ -26,12 +26,13 @@
     font-family: 'Consolas', monospace;
     font-size: 14px;
     resize: vertical;
+    line-height: 1.4;
   }
   button {
     display: block;
-    margin: 20px auto;
-    padding: 14px 60px;
-    font-size: 1.35rem;
+    margin: 24px auto;
+    padding: 16px 70px;
+    font-size: 1.4rem;
     background: #7f00ff;
     color: white;
     border: none;
@@ -39,34 +40,34 @@
     cursor: pointer;
     transition: all 0.25s;
   }
-  button:hover { background: #a040ff; transform: scale(1.04); }
+  button:hover { background: #a040ff; transform: scale(1.05); }
   #result {
     background: #0c0014;
     border: 1px solid #442255;
     border-radius: 8px;
-    padding: 18px;
+    padding: 20px;
     white-space: pre-wrap;
     font-family: monospace;
-    min-height: 200px;
+    min-height: 240px;
     color: #aaffaa;
     line-height: 1.45;
   }
-  .info { text-align: center; color: #aa88ff; font-size: 0.95rem; margin: 12px 0; }
+  .info { text-align: center; color: #aa88ff; font-size: 1rem; margin: 12px 0; }
 </style>
 </head>
 <body>
 
 <div class="container">
   <h1>Obfuscateur Lua - Style WeAreDevs v1</h1>
-  <div class="info">Colle ton code → Obfusque → Résultat à exécuter avec loadstring()</div>
+  <div class="info">Colle ton code Lua → Obfusque → Résultat à exécuter avec loadstring() sur Roblox</div>
 
   <div class="split">
     <div>
       <strong>Code original :</strong>
-      <textarea id="input" placeholder="Colle ton script Lua ici..."></textarea>
+      <textarea id="input" placeholder="Colle ton script Lua ici... (print('Hello Roblox!') par exemple)"></textarea>
     </div>
     <div>
-      <strong>Code obfusqué (style WeAreDevs v1) :</strong>
+      <strong>Code obfusqué (WeAreDevs v1 style) :</strong>
       <textarea id="result" readonly></textarea>
     </div>
   </div>
@@ -76,24 +77,19 @@
 
 <script>
 // ───────────────────────────────────────────────
-//   Obfuscateur style WeAreDevs v1 (2026 edition)
+//   Obfuscateur JS style WeAreDevs v1 (2026)
 // ───────────────────────────────────────────────
 
-function randomName(len = 12) {
-  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$";
-  let s = "";
-  for(let i = 0; i < len + Math.floor(Math.random()*8); i++) {
-    s += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return s;
+function randomOffset(min = -600, max = 600) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function toOctal(str) {
-  let r = "";
-  for(let i = 0; i < str.length; i++) {
-    r += "\\" + str.charCodeAt(i).toString(8).padStart(3, "0");
+function toOctalString(str) {
+  let result = "";
+  for (let i = 0; i < str.length; i++) {
+    result += "\\" + str.charCodeAt(i).toString(8).padStart(3, "0");
   }
-  return r;
+  return result;
 }
 
 function obfuscate() {
@@ -107,75 +103,86 @@ function obfuscate() {
 
   let code = input;
 
-  // 1. Récupérer toutes les strings et les encoder en octal
+  // 1. Récupérer et encoder toutes les strings en octal
   const stringTable = [];
-  code = code.replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, (match, quote, esc) => {
+  code = code.replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, (match) => {
     const content = match.slice(1, -1);
     if (content.length < 3 || content.includes('\\')) return match;
 
-    stringTable.push(`"${toOctal(content)}"`);
-    return `__str${stringTable.length - 1}__`;
+    stringTable.push(`"${toOctalString(content)}"`);
+    return `__STR${stringTable.length - 1}__`;
   });
 
-  // 2. Créer la table de strings encodées
-  let strTableCode = `local b={${stringTable.join(",")}}`;
+  // 2. Table de strings encodées
+  const strTable = `local b={${stringTable.join(",")}}`;
 
-  // 3. Créer une table de mapping caractère → offset (style WeAreDevs)
+  // 3. Table de mapping caractère → offset (style WeAreDevs)
   const mapping = {};
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_";
-  for (let c of chars) {
-    mapping[c] = Math.floor(Math.random() * 900) - 450; // offset entre -450 et +450
+  for (let i = 0; i < chars.length; i++) {
+    const c = chars[i];
+    mapping[c] = randomOffset(-800, 800);
   }
 
   let mapCode = "local o={";
-  for (let [k, v] of Object.entries(mapping)) {
-    mapCode += `${k}=${v},`;
+  for (const [char, offset] of Object.entries(mapping)) {
+    mapCode += `${char}=${offset},`;
   }
-  mapCode += "};";
+  mapCode = mapCode.slice(0, -1) + "}";  // retire la dernière virgule
 
-  // 4. Fonction de décodage WeAreDevs-like (add/sub + mapping)
+  // 4. Fonction de décodage très proche du style WeAreDevs v1
   const decoder = `
 local function d(i)
   local s=b[i]
   local r=""
-  local c=0
-  for j=1,#s,4 do
-    local byte=tonumber(s:sub(j+1,j+3),8)
-    byte=byte+o[s:sub(j,j)] or byte
-    c=c+1
-    if c%3==0 then byte=byte-1 elseif c%5==0 then byte=byte+2 end
+  local pos=1
+  local count=0
+  while pos<=#s do
+    local prefix=s:sub(pos,pos)
+    pos=pos+1
+    local num=s:sub(pos,pos+2)
+    pos=pos+3
+    local byte=tonumber(num,8)
+    byte=byte+(o[prefix] or 0)
+    count=count+1
+    if count%3==0 then byte=byte-1
+    elseif count%5==0 then byte=byte+2
+    elseif count%7==0 then byte=byte-3 end
     r=r..string.char(byte)
   end
   return r
 end
 `;
 
-  // 5. Remplacer les placeholders par d()
-  code = code.replace(/__str(\d+)__/g, (m, idx) => `d(${parseInt(idx)+1})`);
+  // 5. Remplacer les placeholders par d(index)
+  code = code.replace(/__STR(\d+)__/g, (m, idx) => `d(${parseInt(idx) + 1})`);
 
-  // 6. Petit junk de base
-  const junk = [
-    "if false then end ",
-    "for _=1,0 do end ",
-    "local _=nil;",
-    "-- WeAreDevs style ",
-    "repeat until true;"
+  // 6. Junk code (léger mais présent)
+  const junkLines = [
+    "if false then end",
+    "for _=1,0 do end",
+    "local _=nil",
+    "repeat until true",
+    "-- skrrt",
+    "local _=math.random()"
   ];
 
   let lines = code.split("\n");
   let newLines = [];
-  for (let line of lines) {
+  for (const line of lines) {
     newLines.push(line);
-    if (Math.random() < 0.22) {
-      newLines.push("  " + junk[Math.floor(Math.random() * junk.length)]);
+    if (Math.random() < 0.25 && line.trim() && !line.includes("--")) {
+      newLines.push("  " + junkLines[Math.floor(Math.random() * junkLines.length)]);
     }
   }
   code = newLines.join("\n");
 
-  // 7. Assemblage final
-  const finalCode = `-- Obfusqué style WeAreDevs v1-ish - ${new Date().toLocaleDateString()}
+  // 7. Assemblage final - structure classique WeAreDevs
+  const finalCode = `-- Obfusqué le ${new Date().toLocaleDateString()} 🔥
+-- Style WeAreDevs v1-ish
+
 return (function(...)
-${strTableCode}
+${strTable}
 ${mapCode}
 ${decoder}
 
