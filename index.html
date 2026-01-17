@@ -3,129 +3,120 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VOITURE DU CIEL × GOUTTE MALADE</title>
+  <title>CHASSEUR</title>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      overflow: hidden;
+    }
+
+    html, body {
+      height: 100%;
+      background: #000;
+      color: #ddd;
+      font-family: "Courier New", Courier, monospace;
+      overflow-x: hidden;
     }
 
     body {
-      height: 100vh;
-      background: linear-gradient(to bottom, #0f001a, #1a0033, #000814);
-      font-family: "Arial", sans-serif;
-      color: #fff;
+      background: 
+        radial-gradient(circle at 15% 85%, #111 0%, #000 40%),
+        #000;
+      background-attachment: fixed;
     }
 
-    .scene {
+    .container {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
       position: relative;
-      width: 100%;
-      height: 100vh;
-      perspective: 1200px;
-    }
-
-    .car {
-      position: absolute;
-      left: 50%;
-      top: -300px;
-      transform: translateX(-50%) rotateY(15deg) rotateX(25deg);
-      width: 420px;
-      filter: drop-shadow(0 0 80px rgba(255,80,0,0.7));
-      animation: 
-        fall 8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards,
-        shake 0.15s infinite alternate;
-      will-change: transform;
-    }
-
-    @keyframes fall {
-      0%   { top: -300px;  transform: translateX(-50%) rotateY(15deg) rotateX(25deg) scale(0.7); }
-      70%  { top: 55%;     transform: translateX(-50%) rotateY(25deg) rotateX(45deg) scale(1.1); }
-      100% { top: 68%;     transform: translateX(-50%) rotateY(38deg) rotateX(68deg) scale(1.25); }
-    }
-
-    @keyframes shake {
-      from { transform: translateX(-50%) rotateY(15deg) rotateX(25deg) translateZ(0px); }
-      to   { transform: translateX(-50%) rotateY(15deg) rotateX(25deg) translateZ(20px); }
-    }
-
-    .water-drop {
-      position: absolute;
-      width: 180px;
-      height: 240px;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      background: radial-gradient(circle at 40% 30%, 
-        rgba(120,220,255,0.9) 0%, 
-        rgba(0,140,255,0.75) 40%, 
-        rgba(0,80,220,0.4) 70%, 
-        transparent 100%);
-      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-      box-shadow: 
-        inset 0 -40px 60px rgba(255,255,255,0.4),
-        0 0 120px rgba(0,180,255,0.8),
-        inset -20px -30px 60px rgba(0,0,0,0.4);
-      filter: blur(2px);
-      animation: pulse 3.5s infinite ease-in-out;
-      pointer-events: none;
-    }
-
-    @keyframes pulse {
-      0%,100%   { transform: translate(-50%, -50%) scale(1);   opacity: 0.85; }
-      50%       { transform: translate(-50%, -50%) scale(1.15); opacity: 1;   }
+      padding: 2rem;
     }
 
     .title {
-      position: absolute;
-      top: 15%;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: clamp(3.5rem, 8vw, 9rem);
+      font-size: clamp(5rem, 14vw, 18rem);
       font-weight: 900;
+      letter-spacing: -0.08em;
+      line-height: 0.82;
       text-align: center;
+      text-transform: uppercase;
       color: transparent;
-      background: linear-gradient(90deg, #ff0066, #ffaa00, #00ffea, #ff0066);
-      background-size: 400%;
+      -webkit-text-stroke: 1.2px #eee;
+      text-stroke: 1.2px #eee;
+      background: linear-gradient(90deg, #222 40%, #ccc 50%, #222 60%);
+      background-size: 300% 100%;
       -webkit-background-clip: text;
       background-clip: text;
-      animation: glitch-text 6s infinite linear;
-      text-shadow: 0 0 30px rgba(255,100,200,0.8);
-      z-index: 10;
+      animation: glitch-text 8s infinite alternate;
+    }
+
+    .subtitle {
+      margin-top: 1.5rem;
+      font-size: clamp(1.6rem, 5vw, 3.8rem);
+      font-weight: 400;
+      letter-spacing: 0.6em;
+      text-align: center;
+      color: #555;
+      text-transform: uppercase;
+    }
+
+    .hunter-word {
+      color: #eee;
+      -webkit-text-stroke: 0.6px #000;
+      text-stroke: 0.6px #000;
+      font-weight: 900;
+    }
+
+    .scanline {
+      position: absolute;
+      inset: 0;
       pointer-events: none;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(0,0,0,0.04) 1px,
+        transparent 2px,
+        transparent 4%
+      );
+      animation: scan 12s linear infinite;
+      opacity: 0.6;
+    }
+
+    .grain {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
     }
 
     @keyframes glitch-text {
-      0%   { background-position: 0% 50%; }
-      25%  { background-position: 100% 50%; }
-      50%  { background-position: 0% 50%; }
-      75%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+      0%,100%   { background-position: 0% 50%; }
+      25%       { background-position: 100% 50%; }
+      50%       { background-position: 30% 50%; }
+      75%       { background-position: 70% 50%; }
     }
 
-    .overlay {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 50% 20%, transparent 30%, rgba(0,0,0,0.7) 70%);
-      pointer-events: none;
+    @keyframes scan {
+      0%   { transform: translateY(-100%); }
+      100% { transform: translateY(100%); }
+    }
+
+    @media (max-width: 600px) {
+      .title { -webkit-text-stroke: 0.8px #eee; }
+      .subtitle { letter-spacing: 0.4em; }
     }
   </style>
 </head>
 <body>
 
-  <div class="scene">
-    <div class="overlay"></div>
+  <div class="grain"></div>
+  <div class="scanline"></div>
 
-    <h1 class="title">WTF IS THIS CAR DOING?!</h1>
-
-    <img 
-      class="car" 
-      src="https://images.unsplash.com/photo-1502877338535-766e3a6052c0?w=1200&q=85" 
-      alt="voiture qui tombe du ciel style fou"
-    />
-
-    <div class="water-drop"></div>
+  <div class="container">
+    <h1 class="title">CHASSEUR</h1>
+    <p class="subtitle">THE <span class="hunter-word">HUNTER</span> NEVER SLEEPS</p>
   </div>
 
 </body>
