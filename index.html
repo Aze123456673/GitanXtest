@@ -2,65 +2,144 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<title>Déobfuscateur Lua - Grok Edition 2026 (WeAreDevs v1 boost)</title>
+<title>Déobfuscateur Lua - Grok Edition 2026 (Amélioré)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <style>
-  body { font-family: 'Segoe UI', sans-serif; background: #0d001a; color: #d0c0ff; margin:0; padding:20px; background: linear-gradient(135deg, #0d001a, #1a0033); }
-  h1 { color: #bb66ff; text-align:center; }
-  textarea { width:100%; max-width:1000px; height:280px; margin:16px auto; display:block; background:#111122; color:#e0d0ff; border:1px solid #553366; border-radius:8px; padding:16px; font-family:monospace; font-size:14px; }
-  button { display:block; margin:20px auto; padding:14px 40px; font-size:1.2rem; background:#7f00ff; color:white; border:none; border-radius:6px; cursor:pointer; transition:0.3s; }
+  body { 
+    font-family: 'Segoe UI', sans-serif; 
+    background: linear-gradient(135deg, #0d001a, #1a0033); 
+    color: #d0c0ff; 
+    margin:0; 
+    padding:20px; 
+  }
+  h1 { color: #bb66ff; text-align:center; margin-bottom: 0.8em; }
+  .container { max-width:1100px; margin:auto; }
+  .mode-select { text-align:center; margin:1.5em 0; }
+  select { 
+    padding:8px 16px; 
+    font-size:1rem; 
+    background:#222244; 
+    color:#fff; 
+    border:1px solid #664488; 
+    border-radius:4px; 
+  }
+  textarea { 
+    width:100%; 
+    max-width:1000px; 
+    height:300px; 
+    margin:0 auto 1.5em; 
+    display:block; 
+    background:#111122; 
+    color:#e0d0ff; 
+    border:1px solid #553366; 
+    border-radius:8px; 
+    padding:16px; 
+    font-family:monospace; 
+    font-size:14px; 
+    resize:vertical;
+  }
+  button { 
+    display:block; 
+    margin:1.5em auto; 
+    padding:14px 40px; 
+    font-size:1.2rem; 
+    background:#7f00ff; 
+    color:white; 
+    border:none; 
+    border-radius:6px; 
+    cursor:pointer; 
+    transition:0.2s; 
+  }
   button:hover { background:#9f40ff; transform:scale(1.05); }
-  #result { width:100%; max-width:1000px; margin:20px auto; background:#0a0011; border:1px solid #442266; border-radius:8px; padding:18px; white-space:pre-wrap; font-family:monospace; min-height:180px; color:#b0ffb0; }
-  .mode-select { text-align:center; margin:16px; }
-  select { padding:8px 16px; font-size:1rem; background:#222244; color:#fff; border:1px solid #664488; border-radius:4px; }
+  button:active { transform:scale(0.98); }
+  #result { 
+    width:100%; 
+    max-width:1000px; 
+    margin:1.5em auto; 
+    background:#0a0011; 
+    border:1px solid #442266; 
+    border-radius:8px; 
+    padding:18px; 
+    white-space:pre-wrap; 
+    font-family:monospace; 
+    min-height:180px; 
+    color:#b0ffb0; 
+    line-height:1.4;
+  }
+  .error { color: #ff9999 !important; }
 </style>
 </head>
 <body>
-
-<div style="max-width:1100px;margin:auto;">
-  <h1>Déobfuscateur Lua (Street + WeAreDevs v1.0.0)</h1>
-  
+<div class="container">
+  <h1>Déobfuscateur Lua (Street + WeAreDevs)</h1>
+ 
   <div class="mode-select">
-    <label>Mode : </label>
+    <label for="mode">Mode : </label>
     <select id="mode">
       <option value="general">Général (basique)</option>
-      <option value="wearedevs" selected>WeAreDevs v1.0.0</option>
+      <option value="wearedevs" selected>WeAreDevs (amélioré)</option>
     </select>
   </div>
 
-  <textarea id="input" placeholder="Colle ton code Lua obfusqué ici... (WeAreDevs v1 ou autre)"></textarea>
-  
-  <button onclick="deobfuscate()">DÉOBFUSQUER MAINTENANT 🔥</button>
-  
-  <div id="result">Résultat ici... (essaie le mode WeAreDevs pour les vieux obfu WAD)</div>
+  <textarea id="input" placeholder="Colle ton code Lua obfusqué ici..."></textarea>
+ 
+  <button onclick="deobfuscate()">DÉOBFUSQUER 🔥</button>
+ 
+  <div id="result">Résultat ici... (colle ton script et choisis un mode)</div>
 </div>
 
 <script>
-// Patterns généraux (comme avant)
 const generalPatterns = [
-  { regex: /loadstring\s*\(/g,     replace: 'load(' },
-  { regex: /\\x([0-9a-fA-F]{2})/g, (_, h) => String.fromCharCode(parseInt(h,16)) },
-  { regex: /\\([0-7]{1,3})/g,      (_, o) => String.fromCharCode(parseInt(o,8))  },
-  // gsub chain typique
-  { regex: /\b_\s*=\s*([^:]+?)\s*:\s*gsub\s*\(\s*"([^"]+)"\s*,\s*"([^"]*)"\s*\)/g,
-    replace: (m, s, p, r) => s.replace(new RegExp(p.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'g'), r) }
+  { regex: /loadstring\s*\(/g, replace: 'load(' },
+  { regex: /\\x([0-9a-fA-F]{2})/g, replace: (_, h) => String.fromCharCode(parseInt(h, 16)) },
+  { regex: /\\([0-7]{1,3})/g, replace: (_, o) => String.fromCharCode(parseInt(o, 8)) },
+  // Chaîne de gsub classique
+  {
+    regex: /\b_\s*=\s*([^:]+?)\s*:\s*gsub\s*\(\s*"([^"]+)"\s*,\s*"([^"]*)"\s*\)/g,
+    replace: (m, s, p, r) => {
+      try {
+        const safeP = p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return s.replace(new RegExp(safeP, 'g'), r);
+      } catch {
+        return m;
+      }
+    }
+  }
 ];
 
-// Patterns spécifiques WeAreDevs v1.0.0 (string table + mapping + shift/add)
 const wearedevsPatterns = [
-  // Décodage octal basique des strings dans la table b = {"\122\073\056"...}
-  { regex: /"\\(\d{1,3}(?:\\(\d{1,3}))*)"/g, 
-    replace: (match, p1) => {
-      let str = '';
-      p1.split('\\').filter(Boolean).forEach(o => str += String.fromCharCode(parseInt(o,8)));
-      return `"${str.replace(/"/g,'\\"')}"`;
+  // Décodage octal plus robuste (gère \123\56 ou 123\56 etc.)
+  {
+    regex: /"((?:\\?\d{1,3})+)"/g,
+    replace: (match, content) => {
+      try {
+        let result = '';
+        let i = 0;
+        while (i < content.length) {
+          if (content[i] === '\\' && /\d/.test(content[i + 1])) {
+            let num = '';
+            i++;
+            while (i < content.length && /\d/.test(content[i]) && num.length < 3) {
+              num += content[i++];
+            }
+            result += String.fromCharCode(parseInt(num, 8));
+          } else {
+            result += content[i++];
+          }
+        }
+        return `"${result.replace(/"/g, '\\"').replace(/\n/g, '\\n')}"`;
+      } catch {
+        return match;
+      }
     }
   },
-  // Tentative de simplification du mapping o = {D=..., T=..., ...} avec les calculs à la con
-  { regex: /local\s+o\s*=\s*{[^}]+}/g, replace: '// MAPPING TABLE REMOVED (WeAreDevs junk)' },
-  // Remplace le loop de décodage par un commentaire (pas parfait mais aide à lire)
-  { regex: /for\s+b\s*=\s*[^,]+,\s*#[^,]+,\s*[^)]+\s*do\s*local\s*M\s*=\s*Z\[b\].*?end/g, 
-    replace: '// WeAreDevs STRING DECODER LOOP - strings should be decoded above' }
+  // Supprime la table de mapping (souvent inutile après décodage)
+  { regex: /local\s+[a-zA-Z_]\s*=\s*{[^}]+?}/g, replace: '// Mapping table supprimée' },
+  // Remplace le decodeur en boucle par un commentaire
+  {
+    regex: /for\s+[a-zA-Z_]\s*=\s*[^,]+?,\s*#[^,]+?,\s*[^)]+?\s*do[\s\S]*?end/g,
+    replace: '// WeAreDevs string decoder loop remplacé'
+  }
 ];
 
 function deobfuscate() {
@@ -69,14 +148,14 @@ function deobfuscate() {
   const resultDiv = document.getElementById('result');
 
   if (!input) {
-    resultDiv.innerHTML = "Mets du code quand même bg 😏";
-    resultDiv.style.color = "#ff9999";
+    resultDiv.innerHTML = "Colle un script quand même bg 😏";
+    resultDiv.className = 'error';
     return;
   }
 
   let code = input;
 
-  // Étape 1 : toujours appliquer les patterns généraux
+  // Étape 1 : patterns généraux
   for (const p of generalPatterns) {
     if (typeof p.replace === 'function') {
       code = code.replace(p.regex, p.replace);
@@ -85,8 +164,8 @@ function deobfuscate() {
     }
   }
 
-  // Étape 2 : si mode WeAreDevs activé → attaque spécifique
-  if (mode === "wearedevs") {
+  // Étape 2 : patterns WeAreDevs si sélectionné
+  if (mode === 'wearedevs') {
     for (const p of wearedevsPatterns) {
       if (typeof p.replace === 'function') {
         code = code.replace(p.regex, p.replace);
@@ -95,32 +174,33 @@ function deobfuscate() {
       }
     }
 
-    // Petit extra : tente de décoder les \xxx directement dans toute la string table
-    code = code.replace(/"((?:\\\d{1,3})+)"/g, (m, content) => {
-      try {
-        let decoded = '';
-        const octals = content.match(/\\(\d{1,3})/g) || [];
-        for (const oct of octals) {
-          decoded += String.fromCharCode(parseInt(oct.slice(1), 8));
-        }
-        return `"${decoded.replace(/"/g,'\\"').replace(/\n/g,'\\n')}"`;
-      } catch {
-        return m;
-      }
-    });
+    // Décodage supplémentaire pour les strings qui auraient échappé
+    code = code.replace(/"((?:\\?\d{1,3})+)"/g, wearedevsPatterns[0].replace);
   }
 
-  // Nettoyage final (indent un minimum, enlève les espaces inutiles)
+  // Nettoyage final
   code = code
-    .replace(/\s{2,}/g, ' ')
-    .replace(/;\s*/g, ';\n')
-    .replace(/end\s*/g, 'end\n')
-    .replace(/then\s*/g, 'then\n')
-    .replace(/else\s*/g, 'else\n')
+    .replace(/\s{2,}/g, ' ')           // multiples espaces → un seul
+    .replace(/;\s*/g, ';\n')           // ; → nouvelle ligne
+    .replace(/\s*end\s*/g, '\nend\n')  // meilleur espacement end
+    .replace(/\s*then\s*/g, '\nthen\n')
+    .replace(/\s*else\s*/g, '\nelse\n')
+    .replace(/\s*elseif\s*/g, '\nelseif ')
+    .replace(/,\s*/g, ', ')
+    .replace(/\(\s*/g, '(')
+    .replace(/\s*\)/g, ')')
+    .replace(/{\s*/g, '{ ')
+    .replace(/\s*}/g, ' }')
     .trim();
 
-  resultDiv.innerHTML = code || "(Pas grand chose récupéré... essaie un autre mode ou un autre script)";
-  resultDiv.style.color = code.length > 100 ? "#b0ffb0" : "#ffaa99";
+  // Résultat
+  if (code.length < 50) {
+    resultDiv.innerHTML = "(Quasiment rien récupéré... essaie l’autre mode ou un autre script)";
+    resultDiv.className = 'error';
+  } else {
+    resultDiv.textContent = code;
+    resultDiv.className = '';
+  }
 }
 </script>
 </body>
