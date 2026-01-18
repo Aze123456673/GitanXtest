@@ -1,129 +1,198 @@
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<title>Déobfuscateur Lua - Lune Inspired Edition 2026</title>
+<title>Déobfuscateur Lua - Lune + WeAreDevs Fix 2026</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <style>
-body { font-family: 'Segoe UI', sans-serif; background: #0d001a; color: #d0c0ff; margin:0; padding:20px; background: linear-gradient(135deg, #0d001a, #1a0033); }
-h1 { color: #bb66ff; text-align:center; }
-textarea { width:100%; max-width:1000px; height:280px; margin:16px auto; display:block; background:#111122; color:#e0d0ff; border:1px solid #553366; border-radius:8px; padding:16px; font-family:monospace; font-size:14px; }
-button { display:block; margin:20px auto; padding:14px 40px; font-size:1.2rem; background:#7f00ff; color:white; border:none; border-radius:6px; cursor:pointer; transition:0.3s; }
-button:hover { background:#9f40ff; transform:scale(1.05); }
-#result { width:100%; max-width:1000px; margin:20px auto; background:#0a0011; border:1px solid #442266; border-radius:8px; padding:18px; white-space:pre-wrap; font-family:monospace; min-height:180px; color:#b0ffb0; }
-.mode-select { text-align:center; margin:16px; }
-select { padding:8px 16px; font-size:1rem; background:#222244; color:#fff; border:1px solid #664488; border-radius:4px; }
-.info { text-align:center; color:#aa88ff; font-size:0.95rem; margin:12px 0; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0d001a, #1a0033);
+    color: #d0c0ff;
+    margin: 0;
+    padding: 20px;
+  }
+  .container { max-width: 1100px; margin: auto; }
+  h1 { color: #bb66ff; text-align: center; margin-bottom: 0.6em; }
+  .info { text-align: center; color: #aa88ff; font-size: 0.95rem; margin: 12px 0; }
+  .mode-select { text-align: center; margin: 16px 0; }
+  select {
+    padding: 8px 16px;
+    font-size: 1rem;
+    background: #222244;
+    color: #fff;
+    border: 1px solid #664488;
+    border-radius: 4px;
+  }
+  textarea {
+    width: 100%;
+    max-width: 1000px;
+    height: 320px;
+    margin: 16px auto;
+    display: block;
+    background: #111122;
+    color: #e0d0ff;
+    border: 1px solid #553366;
+    border-radius: 8px;
+    padding: 16px;
+    font-family: monospace;
+    font-size: 14px;
+    resize: vertical;
+  }
+  button {
+    display: block;
+    margin: 24px auto;
+    padding: 14px 50px;
+    font-size: 1.3rem;
+    background: #7f00ff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  button:hover {
+    background: #9f40ff;
+    transform: scale(1.05);
+  }
+  #result {
+    width: 100%;
+    max-width: 1000px;
+    margin: 20px auto;
+    background: #0a0011;
+    border: 1px solid #442266;
+    border-radius: 8px;
+    padding: 18px;
+    white-space: pre-wrap;
+    font-family: monospace;
+    min-height: 200px;
+    color: #b0ffb0;
+    line-height: 1.45;
+  }
+  .error { color: #ff9999 !important; }
 </style>
 </head>
 <body>
-<div style="max-width:1100px;margin:auto;">
-<h1>Déobfuscateur Lua (Lune Inspired + WeAreDevs/Street 2026)</h1>
-<div class="info">Inspiré par Lune runtime pour une meilleure compatibilité Luau. Colle ton code obfusqué, choisis un mode, et déobfusque !</div>
-  
-    Mode : 
+
+<div class="container">
+  <h1>Déobfuscateur Lua (Lune + WeAreDevs/Street)</h1>
+  <div class="info">Colle ton code obfusqué → choisis mode → déobfusque</div>
+
+  <div class="mode-select">
+    <label for="mode">Mode : </label>
     <select id="mode">
-      <option value="general">Général (basique + Lune style)</option>
-      <option value="wearedevs" selected>WeAreDevs v1.x (avancé)</option>
-      <option value="street">Street Obfu (XOR + shift)</option>
+      <option value="general">Général (basique)</option>
+      <option value="wearedevs" selected>WeAreDevs v1.x</option>
+      <option value="street">Street / XOR</option>
     </select>
-  
-  <textarea id="input" placeholder="Colle ton code Lua obfusqué ici... (WeAreDevs, Street ou autre)"></textarea>
-<button onclick="deobfuscate()">DÉOBFUSQUER MAINTENANT 🔥</button>
-  Résultat ici... (essaie différents modes pour mieux déobfusquer)
+  </div>
+
+  <textarea id="input" placeholder="Colle ton code Lua obfusqué ici..."></textarea>
+
+  <button onclick="deobfuscate()">DÉOBFUSQUER 🔥</button>
+
+  <div id="result">Résultat ici... (change de mode si besoin)</div>
+</div>
 
 <script>
-// Patterns généraux (améliorés avec inspiration Lune pour Luau compat)
+// Patterns de base (toujours appliqués)
 const generalPatterns = [
-  { regex: /loadstring\s*$$   /g, replace: 'load(' }, // Lune uses load
-  { regex: /\\x([0-9a-fA-F]{2})/g, replace: (_, h) => String.fromCharCode(parseInt(h,16)) },
-  { regex: /\\([0-7]{1,3})/g, replace: (_, o) => String.fromCharCode(parseInt(o,8)) },
-  // gsub chain (typique obfu)
-  { regex: /\b_\s*=\s*([^:]+?)\s*:\s*gsub\s*\(\s*"([^"]+)"\s*,\s*"([^"]*)"\s*   $$/g,
-    replace: (m, s, p, r) => s.replace(new RegExp(p.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'g'), r) }
+  { regex: /loadstring\s*\(/g, replace: 'load(' },
+  { regex: /\\x([0-9a-fA-F]{2})/gi, replace: (_, h) => String.fromCharCode(parseInt(h, 16)) },
+  { regex: /\\([0-7]{1,3})/g, replace: (_, o) => String.fromCharCode(parseInt(o, 8)) },
+  // gsub chain simple
+  {
+    regex: /\b_\s*=\s*([^:]+?)\s*:\s*gsub\s*\(\s*"([^"]+)"\s*,\s*"([^"]*)"\s*\)/g,
+    replace: (match, source, pattern, repl) => {
+      try {
+        const safePattern = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return source.replace(new RegExp(safePattern, 'g'), repl);
+      } catch {
+        return match;
+      }
+    }
+  }
 ];
-// Patterns WeAreDevs v1.x (strings octal + mapping + decode loop)
+
+// Patterns WeAreDevs v1 (octal + mapping)
 const wearedevsPatterns = [
-// Décode octal robuste (gère \123 ou 123 mélangés)
-{ regex: /"((?:\?\d{1,3})+)"/g,
-replace: (match, content) => {
-let result = '';
-let i = 0;
-while (i < content.length) {
-if (content[i] === '\' && /\d/.test(content[i + 1])) {
-let num = '';
-i++;
-while (i < content.length && /\d/.test(content[i]) && num.length < 3) {
-num += content[i++];
-}
-result += String.fromCharCode(parseInt(num, 8));
-} else if (/\d/.test(content[i])) {
-let num = '';
-while (i < content.length && /\d/.test(content[i]) && num.length < 3) {
-num += content[i++];
-}
-result += String.fromCharCode(parseInt(num, 8));
-} else {
-result += content[i++];
-}
-}
-return "${result.replace(/"/g, '\\"').replace(/\n/g, '\\n')}";
-}
-},
-// Supprime mapping o = {...}
-{ regex: /local\s+o\s*=\s*{[^}]+}/g, replace: '// Mapping table supprimée (WeAreDevs junk)' },
-// Supprime decode loop
-{ regex: /for\s+[a-zA-Z_]\s*=\s*[^,]+,\s*#[^,]+,\s*[^)]+\sdo[\s\S]?end/g, replace: '// Decode loop supprimée (strings décodées)' }
+  // Décodeur octal robuste (gère plusieurs formats)
+  {
+    regex: /"((?:\\?\d{1,3})+)"/g,
+    replace: (match, content) => {
+      try {
+        let result = '';
+        let i = 0;
+        while (i < content.length) {
+          if (content[i] === '\\' && /\d/.test(content[i + 1])) {
+            let num = '';
+            i++;
+            while (i < content.length && /\d/.test(content[i]) && num.length < 3) {
+              num += content[i++];
+            }
+            result += String.fromCharCode(parseInt(num, 8));
+          } else {
+            result += content[i++];
+          }
+        }
+        return `"${result.replace(/"/g, '\\"')}"`;
+      } catch {
+        return match;
+      }
+    }
+  },
+  // Supprime mapping table
+  { regex: /local\s+o\s*=\s*{[^}]*}/g, replace: '// o = mapping table supprimée' },
+  // Supprime boucle decode
+  { regex: /for\s+[a-zA-Z_]\s*=\s*[^,]+?,\s*#[^,]+?,\s*[^)]+?\s*do[\s\S]*?end/g, replace: '// Boucle de décodage supprimée' }
 ];
-// Patterns Street (XOR + bit shift, inspiré Lune pour safe exec)
-const streetPatterns = [
-// Détecte et simplifie XOR simple
-{ regex: /bit32.bxor\s*$  \s*([^,]+)\s*,\s*([^)]+)\s*  $/g, replace: '// XOR détecté : $1 ^ $2 (Lune style)' },
-// Shift left/right
-{ regex: /bit32.(lshift|rshift)\s*$  \s*([^,]+)\s*,\s*([^)]+)\s*  $/g, replace: '// Shift : $2 ' + ($1 === 'lshift' ? '<<' : '>>') + ' $3' },
-// Supprime junk arithmétique basique
-{ regex: /math.random\s*$  \s*  $/g, replace: '0.5 // junk random supprimé' }
-];
+
 function deobfuscate() {
-const input = document.getElementById('input').value.trim();
-const mode = document.getElementById('mode').value;
-const resultDiv = document.getElementById('result');
-if (!input) {
-resultDiv.innerHTML = "Colle du code bg 😏";
-resultDiv.style.color = "#ff9999";
-return;
-}
-let code = input;
-// Applique toujours général (Lune inspired pour clean Luau)
-for (const p of generalPatterns) {
-code = code.replace(p.regex, typeof p.replace === 'function' ? p.replace : p.replace);
-}
-// Mode spécifique
-if (mode === "wearedevs") {
-for (const p of wearedevsPatterns) {
-code = code.replace(p.regex, typeof p.replace === 'function' ? p.replace : p.replace);
-}
-// Extra décode pour tables strings entières
-code = code.replace(/b\s*=\s*{([^}]+)}/g, (m, tbl) => {
-let decoded = tbl.split(',').map(s => wearedevsPatterns[0].replace(s, s)).join(',');
-return b = {${decoded}} // décodé Lune style;
-});
-} else if (mode === "street") {
-for (const p of streetPatterns) {
-code = code.replace(p.regex, typeof p.replace === 'function' ? p.replace : p.replace);
-}
-}
-// Nettoyage final (indentation améliorée, Lune clean)
-code = code
-.replace(/\s{2,}/g, ' ')
-.replace(/;\s*/g, ';\n')
-.replace(/end\s*/g, '\nend\n')
-.replace(/then\s*/g, '\nthen\n')
-.replace(/else\s*/g, '\nelse\n')
-.replace(/$  \s+/g, '(')
-    .replace(/\s+  $/g, ')')
-.trim();
-resultDiv.innerHTML = code || "(Peu récupéré... change de mode ou script)";
-resultDiv.style.color = code.length > 100 ? "#b0ffb0" : "#ffaa99";
+  const input = document.getElementById('input').value.trim();
+  const mode = document.getElementById('mode').value;
+  const resultDiv = document.getElementById('result');
+
+  if (!input) {
+    resultDiv.innerHTML = "Mets du code quand même bg 😏";
+    resultDiv.className = 'error';
+    return;
+  }
+
+  let code = input;
+
+  // 1. Toujours appliquer les patterns généraux
+  generalPatterns.forEach(p => {
+    code = code.replace(p.regex, typeof p.replace === 'function' ? p.replace : p.replace);
+  });
+
+  // 2. Appliquer patterns spécifiques selon le mode
+  if (mode === 'wearedevs') {
+    wearedevsPatterns.forEach(p => {
+      code = code.replace(p.regex, typeof p.replace === 'function' ? p.replace : p.replace);
+    });
+
+    // Petit extra : ré-essaye sur toutes les strings restantes
+    code = code.replace(/"((?:\\?\d{1,3})+)"/g, wearedevsPatterns[0].replace);
+  }
+
+  // 3. Nettoyage final (plus doux pour ne pas casser)
+  code = code
+    .replace(/\s{2,}/g, ' ')           // espaces multiples → un seul
+    .replace(/;\s*/g, ';\n')           // chaque ; sur nouvelle ligne
+    .replace(/\s*end\s*/g, '\nend\n')
+    .replace(/\s*then\s*/g, '\nthen\n')
+    .replace(/\s*else\s*/g, '\nelse\n')
+    .replace(/\s*elseif\s*/g, '\nelseif ')
+    .trim();
+
+  // Affichage résultat
+  if (code.length < 40) {
+    resultDiv.innerHTML = "(Presque rien récupéré... essaie un autre mode)";
+    resultDiv.className = 'error';
+  } else {
+    resultDiv.textContent = code;
+    resultDiv.className = '';
+  }
 }
 </script>
 </body>
