@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CHASSEUR - PROTOCOLE ACTIF</title>
+  <title>CHASSEUR - NIGHT PROTOCOLE</title>
   <style>
     * {
       margin: 0;
@@ -25,10 +25,9 @@
       position: fixed;
       inset: 0;
       background: 
-        radial-gradient(circle at 20% 90%, #111 0%, transparent 60%),
-        radial-gradient(circle at 80% 10%, #0a0a0a 0%, transparent 70%);
-      opacity: 0.7;
-      pointer-events: none;
+        radial-gradient(circle at 10% 95%, #0f0f0f 0%, transparent 65%),
+        radial-gradient(circle at 90% 5%, #111 0%, transparent 70%);
+      opacity: 0.8;
       z-index: -2;
     }
 
@@ -37,169 +36,220 @@
       display: grid;
       place-items: center;
       position: relative;
-      padding: 1.5rem;
+      padding: 1rem;
     }
 
     .main-title {
-      font-size: clamp(6rem, 18vw, 22rem);
+      font-size: clamp(7rem, 20vw, 24rem);
       font-weight: 900;
-      letter-spacing: -0.12em;
-      line-height: 0.78;
+      letter-spacing: -0.14em;
+      line-height: 0.75;
       text-align: center;
       text-transform: uppercase;
       color: transparent;
-      -webkit-text-stroke: 1.4px #f0f0f0;
-      background: linear-gradient(90deg, #111 20%, #ccc 50%, #111 80%);
-      background-size: 400% 100%;
+      -webkit-text-stroke: 1.6px #f0f0f0;
+      background: linear-gradient(90deg, #0a0a0a 15%, #ddd 50%, #0a0a0a 85%);
+      background-size: 500% 100%;
       -webkit-background-clip: text;
       background-clip: text;
       animation: 
-        glitch-flow 7s infinite alternate,
-        shake 0.08s infinite alternate;
+        glitch-hyper 6s infinite alternate,
+        shake-intense 0.07s infinite alternate;
     }
 
     .subtitle {
-      margin-top: 0.8rem;
-      font-size: clamp(1.8rem, 6vw, 4.2rem);
-      letter-spacing: 1.2em;
+      margin-top: 0.6rem;
+      font-size: clamp(2rem, 7vw, 4.8rem);
+      letter-spacing: 1.4em;
       text-align: center;
-      color: #444;
+      color: #333;
       text-transform: uppercase;
-      text-shadow: 0 0 10px #000;
+      text-shadow: 0 0 12px #000;
     }
 
-    .hunter-glow {
-      color: #f8f8f8;
-      -webkit-text-stroke: 0.8px #000;
-      animation: pulse-glow 4s infinite alternate;
+    .hunter-core {
+      color: #fafafa;
+      -webkit-text-stroke: 0.9px #000;
+      animation: pulse-hunter 3.5s infinite alternate;
     }
 
-    .target-lock {
+    .target-reticle {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 180px;
-      height: 180px;
-      border: 2px solid #555;
+      width: 220px;
+      height: 220px;
+      border: 3px solid #444;
       border-radius: 50%;
       box-shadow: 
-        0 0 40px #000 inset,
-        0 0 25px #222;
+        0 0 50px #000 inset,
+        0 0 35px #111;
       pointer-events: none;
-      animation: rotate-lock 20s linear infinite;
+      animation: rotate-reticle 18s linear infinite;
     }
 
-    .crosshair {
+    .cross {
       position: absolute;
       inset: 0;
       background: 
-        radial-gradient(circle, transparent 40%, #333 41%, transparent 42%),
-        conic-gradient(from 45deg, transparent 0deg 90deg, #444 90deg 180deg, transparent 180deg 270deg, #444 270deg 360deg);
-      opacity: 0.35;
-      animation: flicker 0.15s infinite alternate;
+        linear-gradient(to right, transparent 49%, #555 49.5%, #555 50.5%, transparent 51%),
+        linear-gradient(to bottom, transparent 49%, #555 49.5%, #555 50.5%, transparent 51%);
+      opacity: 0.4;
+      animation: flicker-hard 0.12s infinite alternate;
     }
 
-    .scanlines, .vhs-noise {
+    .overlay-effects {
       position: fixed;
       inset: 0;
       pointer-events: none;
-      z-index: 999;
+      z-index: 9999;
     }
 
-    .scanlines {
+    .scanlines-heavy {
       background: repeating-linear-gradient(
         to bottom,
         transparent 0px,
-        rgba(0,0,0,0.08) 1px,
+        rgba(0,0,0,0.12) 1px,
         transparent 2px,
-        transparent 5px
+        transparent 6px
       );
-      animation: scan-heavy 9s linear infinite;
-      opacity: 0.75;
+      animation: scan-aggressive 7s linear infinite;
+      opacity: 0.85;
     }
 
-    .vhs-noise {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
+    .crt-grain {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='nf'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23nf)' opacity='0.15'/%3E%3C/svg%3E");
       mix-blend-mode: overlay;
-      animation: grain-move 0.8s steps(5) infinite;
+      animation: grain-shake 0.6s steps(4) infinite;
     }
 
-    .warning {
+    .alert-strip {
       position: absolute;
-      top: 2rem;
+      top: 1.5rem;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 1.4rem;
-      color: #555;
-      letter-spacing: 0.5em;
-      animation: blink 1.8s infinite;
-      text-shadow: 0 0 8px #000;
+      font-size: 1.6rem;
+      color: #444;
+      letter-spacing: 0.7em;
+      animation: warning-blink 1.4s infinite;
+      text-shadow: 0 0 10px #000;
     }
 
-    @keyframes glitch-flow {
+    /* Animations hardcore */
+    @keyframes glitch-hyper {
       0%   { background-position: 0% 50%; }
-      30%  { background-position: 120% 50%; }
-      60%  { background-position: -40% 50%; }
+      20%  { background-position: 150% 50%; }
+      40%  { background-position: -60% 50%; }
+      70%  { background-position: 80% 50%; }
       100% { background-position: 0% 50%; }
     }
 
-    @keyframes shake {
+    @keyframes shake-intense {
       0%,100% { transform: translate(0,0); }
-      50%     { transform: translate(2px, -1px); }
+      50%     { transform: translate(3px, -2px) skew(1deg); }
     }
 
-    @keyframes pulse-glow {
-      0%   { text-shadow: 0 0 10px #000; }
-      100% { text-shadow: 0 0 35px #444, 0 0 60px #222; }
+    @keyframes pulse-hunter {
+      0%   { text-shadow: 0 0 12px #000, 0 0 20px #222; }
+      100% { text-shadow: 0 0 40px #555, 0 0 80px #222; }
     }
 
-    @keyframes rotate-lock {
+    @keyframes rotate-reticle {
       from { transform: translate(-50%,-50%) rotate(0deg); }
       to   { transform: translate(-50%,-50%) rotate(360deg); }
     }
 
-    @keyframes scan-heavy {
-      0%   { transform: translateY(-120%); }
-      100% { transform: translateY(120%); }
+    @keyframes scan-aggressive {
+      0%   { transform: translateY(-150%); }
+      100% { transform: translateY(150%); }
     }
 
-    @keyframes flicker {
-      0%,100% { opacity: 0.35; }
-      50%     { opacity: 0.55; }
+    @keyframes flicker-hard {
+      0%,100% { opacity: 0.4; }
+      50%     { opacity: 0.65; }
     }
 
-    @keyframes grain-move {
+    @keyframes grain-shake {
       0%   { background-position: 0 0; }
-      100% { background-position: 100px 100px; }
+      100% { background-position: 140px 140px; }
     }
 
-    @keyframes blink {
-      0%,100% { opacity: 0.3; }
-      50%     { opacity: 0.9; }
+    @keyframes warning-blink {
+      0%,100% { opacity: 0.25; }
+      50%     { opacity: 1; }
     }
 
     @media (max-width: 768px) {
-      .main-title { -webkit-text-stroke: 1px #eee; font-size: clamp(5rem, 16vw, 14rem); }
-      .subtitle { letter-spacing: 0.8em; }
+      .main-title { -webkit-text-stroke: 1.1px #eee; font-size: clamp(6rem, 18vw, 16rem); }
+      .subtitle { letter-spacing: 0.9em; }
     }
+
+    /* Musique embed */
+    .music-player {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      z-index: 10000;
+      opacity: 0.35;
+      transition: opacity 0.4s;
+    }
+
+    .music-player:hover { opacity: 0.9; }
   </style>
 </head>
 <body>
 
-  <div class="vhs-noise"></div>
-  <div class="scanlines"></div>
+  <div class="overlay-effects">
+    <div class="crt-grain"></div>
+    <div class="scanlines-heavy"></div>
+  </div>
 
-  <div class="warning">TARGET ACQUIRED - LOCK ON</div>
+  <div class="alert-strip">ACQUISITION DE CIBLE - PROTOCOLE CHASSEUR ACTIF</div>
 
   <div class="container">
-    <div class="target-lock">
-      <div class="crosshair"></div>
+    <div class="target-reticle">
+      <div class="cross"></div>
     </div>
 
     <h1 class="main-title">CHASSEUR</h1>
-    <p class="subtitle">LA <span class="hunter-glow">NIGHT</span> EST À LUI</p>
+    <p class="subtitle">LA NUIT <span class="hunter-core">APPARTIENT</span> AU CHASSEUR</p>
   </div>
+
+  <!-- Musique de fond - track Spotify -->
+  <div class="music-player">
+    <iframe 
+      style="border-radius:12px" 
+      src="https://open.spotify.com/embed/track/5zSjh9CFVoMLZDXghPx5x2?utm_source=generator" 
+      width="300" 
+      height="80" 
+      frameborder="0" 
+      allowfullscreen="" 
+      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+      loading="lazy">
+    </iframe>
+  </div>
+
+  <!-- Petit script pour tenter l'autoplay (marche parfois) -->
+  <script>
+    window.addEventListener('load', () => {
+      const iframe = document.querySelector('iframe');
+      if (iframe) {
+        // On tente de focus + play après un petit délai
+        setTimeout(() => {
+          try {
+            iframe.contentWindow.postMessage('{"command":"play"}', '*');
+          } catch(e) {}
+        }, 1500);
+      }
+    });
+
+    // Option : lancer sur clic n'importe où (pour mobile/desktop strict)
+    document.body.addEventListener('click', () => {
+      const iframe = document.querySelector('iframe');
+      if (iframe) iframe.contentWindow.postMessage('{"command":"play"}', '*');
+    }, { once: true });
+  </script>
 
 </body>
 </html>
