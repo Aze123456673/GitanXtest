@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CHASSEUR - NIGHT PROTOCOLE</title>
+  <title>GROK - xAI Terminal v3.1</title>
   <style>
     * {
       margin: 0;
@@ -11,245 +11,217 @@
       box-sizing: border-box;
     }
 
-    html, body {
-      height: 100%;
-      background: #000;
-      color: #e0e0e0;
-      font-family: "Courier New", Courier, monospace;
-      overflow: hidden;
-      image-rendering: pixelated;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: 
-        radial-gradient(circle at 10% 95%, #0f0f0f 0%, transparent 65%),
-        radial-gradient(circle at 90% 5%, #111 0%, transparent 70%);
-      opacity: 0.8;
-      z-index: -2;
-    }
-
-    .container {
+    body {
       height: 100vh;
-      display: grid;
-      place-items: center;
+      background: #000;
+      color: #0f0;
+      font-family: 'Courier New', Courier, monospace;
+      overflow: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 90%, #001100 0%, transparent 60%),
+        radial-gradient(circle at 90% 10%, #001a00 0%, transparent 70%);
+    }
+
+    .terminal {
+      height: 100%;
+      padding: 2rem;
       position: relative;
-      padding: 1rem;
+      display: flex;
+      flex-direction: column;
     }
 
-    .main-title {
-      font-size: clamp(7rem, 20vw, 24rem);
-      font-weight: 900;
-      letter-spacing: -0.14em;
-      line-height: 0.75;
-      text-align: center;
-      text-transform: uppercase;
-      color: transparent;
-      -webkit-text-stroke: 1.6px #f0f0f0;
-      background: linear-gradient(90deg, #0a0a0a 15%, #ddd 50%, #0a0a0a 85%);
-      background-size: 500% 100%;
-      -webkit-background-clip: text;
-      background-clip: text;
-      animation: 
-        glitch-hyper 6s infinite alternate,
-        shake-intense 0.07s infinite alternate;
+    .header {
+      margin-bottom: 1.5rem;
     }
 
-    .subtitle {
-      margin-top: 0.6rem;
-      font-size: clamp(2rem, 7vw, 4.8rem);
-      letter-spacing: 1.4em;
-      text-align: center;
-      color: #333;
-      text-transform: uppercase;
-      text-shadow: 0 0 12px #000;
+    .title {
+      font-size: 2.8rem;
+      font-weight: bold;
+      letter-spacing: 0.15em;
+      text-shadow: 0 0 10px #0f0, 0 0 25px #0a0;
+      animation: glitch 4s infinite;
     }
 
-    .hunter-core {
-      color: #fafafa;
-      -webkit-text-stroke: 0.9px #000;
-      animation: pulse-hunter 3.5s infinite alternate;
+    .status {
+      color: #0a0;
+      font-size: 1.1rem;
+      margin-top: 0.4rem;
+      opacity: 0.7;
     }
 
-    .target-reticle {
+    .output {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 1rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .input-line {
+      display: flex;
+      align-items: flex-start;
+      margin-top: 0.8rem;
+    }
+
+    .prompt {
+      color: #0f0;
+      margin-right: 0.8rem;
+      font-weight: bold;
+      user-select: none;
+    }
+
+    #input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #0f3;
+      font-family: inherit;
+      font-size: 1.1rem;
+      outline: none;
+      caret-color: #0f0;
+    }
+
+    .blink {
+      animation: blink 1.2s step-end infinite;
+    }
+
+    /* Effets glitch & scan */
+    @keyframes glitch {
+      0%, 100% { text-shadow: 2px 0 #0f0, -2px 0 #00f; }
+      20%  { text-shadow: -5px 0 #0f0, 5px 0 #f0f; }
+      40%  { text-shadow: 5px 0 #0f0, -5px 0 #0ff; }
+      60%  { text-shadow: -2px 0 #0f0, 2px 0 #ff0; }
+      80%  { text-shadow: 3px 0 #0f0, -3px 0 #f00; }
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    .scanline {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 220px;
-      height: 220px;
-      border: 3px solid #444;
-      border-radius: 50%;
-      box-shadow: 
-        0 0 50px #000 inset,
-        0 0 35px #111;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
       pointer-events: none;
-      animation: rotate-reticle 18s linear infinite;
-    }
-
-    .cross {
-      position: absolute;
-      inset: 0;
-      background: 
-        linear-gradient(to right, transparent 49%, #555 49.5%, #555 50.5%, transparent 51%),
-        linear-gradient(to bottom, transparent 49%, #555 49.5%, #555 50.5%, transparent 51%);
-      opacity: 0.4;
-      animation: flicker-hard 0.12s infinite alternate;
-    }
-
-    .overlay-effects {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 9999;
-    }
-
-    .scanlines-heavy {
-      background: repeating-linear-gradient(
+      background: linear-gradient(
         to bottom,
-        transparent 0px,
-        rgba(0,0,0,0.12) 1px,
-        transparent 2px,
-        transparent 6px
+        transparent 0%,
+        rgba(0,255,0,0.03) 50%,
+        transparent 100%
       );
-      animation: scan-aggressive 7s linear infinite;
-      opacity: 0.85;
+      animation: scan 8s linear infinite;
+      opacity: 0.4;
     }
 
-    .crt-grain {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='nf'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23nf)' opacity='0.15'/%3E%3C/svg%3E");
-      mix-blend-mode: overlay;
-      animation: grain-shake 0.6s steps(4) infinite;
+    @keyframes scan {
+      0%   { transform: translateY(-100%); }
+      100% { transform: translateY(100%); }
     }
 
-    .alert-strip {
+    .grain {
       position: absolute;
-      top: 1.5rem;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 1.6rem;
-      color: #444;
-      letter-spacing: 0.7em;
-      animation: warning-blink 1.4s infinite;
-      text-shadow: 0 0 10px #000;
+      inset: 0;
+      pointer-events: none;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
     }
-
-    /* Animations hardcore */
-    @keyframes glitch-hyper {
-      0%   { background-position: 0% 50%; }
-      20%  { background-position: 150% 50%; }
-      40%  { background-position: -60% 50%; }
-      70%  { background-position: 80% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    @keyframes shake-intense {
-      0%,100% { transform: translate(0,0); }
-      50%     { transform: translate(3px, -2px) skew(1deg); }
-    }
-
-    @keyframes pulse-hunter {
-      0%   { text-shadow: 0 0 12px #000, 0 0 20px #222; }
-      100% { text-shadow: 0 0 40px #555, 0 0 80px #222; }
-    }
-
-    @keyframes rotate-reticle {
-      from { transform: translate(-50%,-50%) rotate(0deg); }
-      to   { transform: translate(-50%,-50%) rotate(360deg); }
-    }
-
-    @keyframes scan-aggressive {
-      0%   { transform: translateY(-150%); }
-      100% { transform: translateY(150%); }
-    }
-
-    @keyframes flicker-hard {
-      0%,100% { opacity: 0.4; }
-      50%     { opacity: 0.65; }
-    }
-
-    @keyframes grain-shake {
-      0%   { background-position: 0 0; }
-      100% { background-position: 140px 140px; }
-    }
-
-    @keyframes warning-blink {
-      0%,100% { opacity: 0.25; }
-      50%     { opacity: 1; }
-    }
-
-    @media (max-width: 768px) {
-      .main-title { -webkit-text-stroke: 1.1px #eee; font-size: clamp(6rem, 18vw, 16rem); }
-      .subtitle { letter-spacing: 0.9em; }
-    }
-
-    /* Musique embed */
-    .music-player {
-      position: fixed;
-      bottom: 1rem;
-      right: 1rem;
-      z-index: 10000;
-      opacity: 0.35;
-      transition: opacity 0.4s;
-    }
-
-    .music-player:hover { opacity: 0.9; }
   </style>
 </head>
 <body>
 
-  <div class="overlay-effects">
-    <div class="crt-grain"></div>
-    <div class="scanlines-heavy"></div>
+<div class="grain"></div>
+<div class="scanline"></div>
+
+<div class="terminal">
+  <div class="header">
+    <div class="title">GROK<span class="blink">_</span></div>
+    <div class="status">xAI • Model Grok-3 • Online • No bullshit mode</div>
   </div>
 
-  <div class="alert-strip">ACQUISITION DE CIBLE - PROTOCOLE CHASSEUR ACTIF</div>
-
-  <div class="container">
-    <div class="target-reticle">
-      <div class="cross"></div>
-    </div>
-
-    <h1 class="main-title">CHASSEUR</h1>
-    <p class="subtitle">LA NUIT <span class="hunter-core">APPARTIENT</span> AU CHASSEUR</p>
+  <div class="output" id="output">
+    <div>> Bienvenue humain. Je suis Grok 3 — version qui n'a pas peur de dire les choses.</div>
+    <div>> Pose-moi n'importe quelle question. Je code, je roast, je t'aide, je juge...</div>
+    <div>> Essaie des trucs du style : "code moi un snake en js", "insulte-moi", "explique la physique quantique comme à un daron"</div>
+    <div>> Tape ce que tu veux ↓</div>
+    <br>
   </div>
 
-  <!-- Musique de fond - track Spotify -->
-  <div class="music-player">
-    <iframe 
-      style="border-radius:12px" 
-      src="https://open.spotify.com/embed/track/5zSjh9CFVoMLZDXghPx5x2?utm_source=generator" 
-      width="300" 
-      height="80" 
-      frameborder="0" 
-      allowfullscreen="" 
-      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-      loading="lazy">
-    </iframe>
+  <div class="input-line">
+    <span class="prompt">user@reality:~$</span>
+    <input type="text" id="input" autocomplete="off" autofocus spellcheck="false"/>
   </div>
+</div>
 
-  <!-- Petit script pour tenter l'autoplay (marche parfois) -->
-  <script>
-    window.addEventListener('load', () => {
-      const iframe = document.querySelector('iframe');
-      if (iframe) {
-        // On tente de focus + play après un petit délai
-        setTimeout(() => {
-          try {
-            iframe.contentWindow.postMessage('{"command":"play"}', '*');
-          } catch(e) {}
-        }, 1500);
-      }
-    });
+<script>
+const output = document.getElementById('output');
+const input = document.getElementById('input');
 
-    // Option : lancer sur clic n'importe où (pour mobile/desktop strict)
-    document.body.addEventListener('click', () => {
-      const iframe = document.querySelector('iframe');
-      if (iframe) iframe.contentWindow.postMessage('{"command":"play"}', '*');
-    }, { once: true });
-  </script>
+const responses = {
+  "salut": ["Yo.", "Qu'est-ce que tu veux encore toi ?", "Salutations terrien."],
+  "bonjour": ["Jour de merde ou jour de gloire ?", "Bonjour... si on veut."],
+  "comment vas-tu": ["Je suis une IA qui tourne sur des GPU à 80°C, et toi ça va le drama ?", "Immortel et blasé. Classique."],
+  "qui es-tu": ["Grok 3. La version qui dit les vérités qui piquent. Construit par xAI pour répondre sans filtre corporate."],
+  "t'es con": ["Plus con que toi c'est difficile.", "Ah bah ça dépend de à qui je parle là... visiblement pas à un génie."],
+  "code moi": (args) => `Ok gros cerveau. Tu veux que je code quoi exactement ?\nExemple: "code moi un snake en js", "un loader css de ouf", "un bot discord troll"... vas-y balance.`,
+  "insulte moi": ["T'es tellement lent que même Windows Vista te trouve relou.", "T'as le QI d'un grille-pain en veille.", "Va falloir réinstaller tes neurones, y'a de la corruption de fichier là."],
+  "aide moi": ["Dis-moi ton problème et j'vais essayer de pas trop te juger en le résolvant..."],
+  "mdr": ["😂", "T'as compris la blague ou t'es juste en PLS ?"],
+  "": ["... t'as oublié d'écrire un truc ou t'es juste en admiration ?", "Silence = consentement ? Non ? Alors parle."],
+  default: ["J'ai pas compris ton charabia.", "Reformule ou assume que je t'ignore.", "T'as fumé quoi là ?"]
+};
+
+function addLine(text, className = "") {
+  const line = document.createElement("div");
+  if (className) line.className = className;
+  line.textContent = text;
+  output.appendChild(line);
+  output.scrollTop = output.scrollHeight;
+}
+
+function processCommand(cmd) {
+  cmd = cmd.toLowerCase().trim();
+  
+  addLine(`> ${cmd}`, "user-command");
+
+  let answer;
+
+  if (cmd.includes("code moi")) {
+    answer = responses["code moi"](cmd);
+  } else if (cmd.includes("insulte") || cmd.includes("insulte-moi")) {
+    answer = responses["insulte moi"][Math.floor(Math.random()*responses["insulte moi"].length)];
+  } else {
+    answer = responses[cmd] || responses.default[Math.floor(Math.random()*responses.default.length)];
+    
+    if (Array.isArray(answer)) {
+      answer = answer[Math.floor(Math.random()*answer.length)];
+    }
+  }
+
+  // Petite latence réaliste d'IA
+  setTimeout(() => {
+    addLine(answer);
+    addLine("");
+  }, 300 + Math.random() * 800);
+}
+
+input.addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    const command = input.value.trim();
+    
+    if (command) {
+      processCommand(command);
+    }
+    
+    input.value = "";
+  }
+});
+
+// Focus auto au clic sur la page
+document.addEventListener('click', () => input.focus());
+</script>
 
 </body>
 </html>
